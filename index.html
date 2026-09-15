@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#f4f7fb">
+  <title>整除性：數字守城戰</title>
+  <meta name="description" content="學生整除性練習：判斷一個數能否被 2、5、10、3 整除。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
+  <script src="config.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body class="student-page">
+  <div class="grid-backdrop" aria-hidden="true"></div>
+
+  <section id="login-screen" class="login-screen">
+    <div class="login-shell">
+      <div class="login-art" aria-hidden="true">
+        <span class="number-orbit number-orbit-a">2</span>
+        <span class="number-orbit number-orbit-b">5</span>
+        <span class="number-orbit number-orbit-c">10</span>
+        <span class="number-orbit number-orbit-d">3</span>
+        <div class="login-art-core">
+          <i data-lucide="shield-check"></i>
+        </div>
+      </div>
+      <div class="login-content">
+        <p class="eyebrow">數學任務站</p>
+        <h1>整除性：數字守城戰</h1>
+        <p class="login-lead">辨認數字規律，合力守住全班的能量核心。</p>
+
+        <div class="field-grid">
+          <label class="field">
+            <span>班別</span>
+            <select id="class-select"></select>
+          </label>
+          <label class="field">
+            <span>學號</span>
+            <select id="id-select"></select>
+          </label>
+        </div>
+
+        <div class="identity-preview">
+          <span>作答者</span>
+          <strong id="student-name-display">請選擇班別與學號</strong>
+        </div>
+
+        <button id="login-button" class="primary-button" type="button">
+          <i data-lucide="log-in"></i>
+          <span>進入挑戰</span>
+        </button>
+        <p id="login-status" class="status-message" role="status"></p>
+      </div>
+    </div>
+  </section>
+
+  <div id="game-screen" class="game-shell is-hidden">
+    <header class="topbar">
+      <a class="brand" href="./" aria-label="整除性數字守城戰首頁">
+        <span class="brand-mark"><i data-lucide="binary"></i></span>
+        <span><strong>數字守城戰</strong><small>DIVISIBILITY LAB</small></span>
+      </a>
+      <div class="player-chip">
+        <span id="player-identity">學生</span>
+        <button id="logout-button" class="icon-button" type="button" title="切換學生" aria-label="切換學生">
+          <i data-lucide="log-out"></i>
+        </button>
+      </div>
+    </header>
+
+    <main class="game-layout">
+      <aside class="player-panel panel">
+        <div class="section-label">你的進度</div>
+        <div class="avatar-stage">
+          <span id="player-rank" class="rank-label">規律新手</span>
+          <img id="player-avatar" src="player-lv1.png" alt="學生角色">
+        </div>
+        <div class="level-row">
+          <div>
+            <small>目前程度</small>
+            <strong id="degree-label">程度一</strong>
+          </div>
+          <span id="level-number">1</span>
+        </div>
+        <div class="meter-group">
+          <div class="meter-copy"><span>能量</span><span id="hp-copy">100 / 100</span></div>
+          <div class="meter-track"><span id="hp-bar" class="meter-fill hp-fill"></span></div>
+        </div>
+        <div class="meter-group">
+          <div class="meter-copy"><span>升級進度</span><span id="exp-copy">0 / 120</span></div>
+          <div class="meter-track"><span id="exp-bar" class="meter-fill exp-fill"></span></div>
+        </div>
+        <div class="combo-block">
+          <i data-lucide="flame"></i>
+          <span>連續答對</span>
+          <strong id="combo-count">0</strong>
+        </div>
+      </aside>
+
+      <section class="question-panel panel">
+        <div class="question-head">
+          <div>
+            <span id="degree-tag" class="degree-tag">程度一</span>
+            <h2 id="question-instruction">判斷能否整除</h2>
+          </div>
+          <div class="question-count">第 <strong id="question-count">1</strong> 題</div>
+        </div>
+
+        <div class="number-stage">
+          <span id="question-prefix">這個數</span>
+          <strong id="question-number">248</strong>
+          <span id="question-suffix">能被 2 整除嗎？</span>
+        </div>
+
+        <div id="single-answer" class="single-answer answer-zone">
+          <button class="answer-button can" type="button" data-answer="true">
+            <i data-lucide="circle-check-big"></i>
+            <span>能</span>
+          </button>
+          <button class="answer-button cannot" type="button" data-answer="false">
+            <i data-lucide="circle-x"></i>
+            <span>不能</span>
+          </button>
+        </div>
+
+        <div id="multi-answer" class="multi-answer answer-zone is-hidden" aria-label="程度三答案">
+          <div id="multi-answer-list" class="multi-answer-list"></div>
+          <button id="submit-multi" class="primary-button submit-multi" type="button" disabled>
+            <i data-lucide="swords"></i>
+            <span>送出全部答案</span>
+          </button>
+        </div>
+
+        <div id="feedback" class="feedback is-hidden" role="status" aria-live="polite">
+          <div id="feedback-icon" class="feedback-icon"></div>
+          <div>
+            <strong id="feedback-title"></strong>
+            <p id="feedback-copy"></p>
+          </div>
+          <button id="next-button" class="next-button" type="button">
+            <span>下一題</span><i data-lucide="arrow-right"></i>
+          </button>
+        </div>
+      </section>
+
+      <aside class="mission-panel panel">
+        <div class="section-label">全班任務</div>
+        <div class="core-visual">
+          <img src="monster-lv7.png" alt="數字城守關者">
+          <div class="core-pulse" aria-hidden="true"></div>
+        </div>
+        <h2>混沌數字王</h2>
+        <p>全班答對即可共同削減能量。</p>
+        <div class="meter-group boss-meter">
+          <div class="meter-copy"><span>首領能量</span><span id="boss-copy">10000 / 10000</span></div>
+          <div class="meter-track"><span id="boss-bar" class="meter-fill boss-fill"></span></div>
+        </div>
+        <div class="rule-hint">
+          <i data-lucide="lightbulb"></i>
+          <div><small>觀察提示</small><strong id="rule-hint">留意個位數</strong></div>
+        </div>
+      </aside>
+    </main>
+
+    <footer class="activity-strip">
+      <i data-lucide="radio"></i>
+      <span id="activity-text">系統已就緒，請作答。</span>
+      <a href="dashboard.html">開啟大屏</a>
+    </footer>
+  </div>
+
+  <div id="level-overlay" class="level-overlay is-hidden" role="dialog" aria-modal="true">
+    <div class="level-burst">
+      <i data-lucide="sparkles"></i>
+      <p>LEVEL UP</p>
+      <h2 id="level-overlay-title">進入程度二</h2>
+      <button id="continue-level" class="primary-button" type="button">繼續挑戰</button>
+    </div>
+  </div>
+</body>
+</html>

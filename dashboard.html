@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101827">
+  <title>整除性課堂戰情室</title>
+  <meta name="description" content="整除性課堂即時數據大屏。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js" defer></script>
+  <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
+  <script src="config.js" defer></script>
+  <script src="dashboard.js" defer></script>
+</head>
+<body class="dashboard-page">
+  <div class="dashboard-shell">
+    <header class="dashboard-header">
+      <div>
+        <p class="eyebrow">LIVE CLASSROOM</p>
+        <h1>整除性課堂戰情室</h1>
+      </div>
+      <div class="dashboard-controls">
+        <label class="dashboard-select">
+          <span>顯示班別</span>
+          <select id="class-filter">
+            <option value="">全校總覽</option>
+            <option value="高一甲">高一甲</option>
+            <option value="高一乙">高一乙</option>
+            <option value="高一丙">高一丙</option>
+            <option value="高一丁">高一丁</option>
+          </select>
+        </label>
+        <button id="fullscreen-button" class="dashboard-icon-button" type="button" title="全螢幕" aria-label="全螢幕">
+          <i data-lucide="maximize"></i>
+        </button>
+        <button id="reset-button" class="dashboard-icon-button danger" type="button" title="重置班級紀錄" aria-label="重置班級紀錄">
+          <i data-lucide="rotate-ccw"></i>
+        </button>
+      </div>
+    </header>
+
+    <section class="boss-section">
+      <div class="boss-copy-row">
+        <div>
+          <span>全班共同目標</span>
+          <strong>混沌數字王</strong>
+        </div>
+        <div class="boss-hp-large"><strong id="dashboard-boss-hp">10000</strong><span>/ 10000</span></div>
+      </div>
+      <div class="boss-track"><span id="dashboard-boss-bar"></span></div>
+    </section>
+
+    <section class="dashboard-main">
+      <div class="dashboard-visual panel-dark">
+        <img src="monster-lv7.png" alt="混沌數字王">
+        <div class="battle-stats">
+          <div><span>參與學生</span><strong id="stat-players">0</strong></div>
+          <div><span>已答題</span><strong id="stat-answers">0</strong></div>
+          <div><span>全班正確率</span><strong id="stat-accuracy">--</strong></div>
+        </div>
+      </div>
+
+      <div class="accuracy-panel panel-dark">
+        <div class="panel-heading"><span>作答概況</span><small id="updated-at">等待數據</small></div>
+        <div class="chart-wrap"><canvas id="accuracy-chart"></canvas></div>
+      </div>
+
+      <div class="join-panel panel-dark">
+        <div class="panel-heading"><span>掃碼加入</span><small>學生答題頁</small></div>
+        <div class="qr-frame"><div id="join-qr" aria-label="學生答題頁 QR Code"></div></div>
+        <a id="student-link" href="index.html" target="_blank" rel="noopener">開啟學生頁</a>
+      </div>
+    </section>
+
+    <section class="leaderboard-grid">
+      <article class="leaderboard panel-dark">
+        <div class="leaderboard-title damage"><i data-lucide="zap"></i><span>輸出榜</span><small>總傷害</small></div>
+        <ol id="damage-list"></ol>
+      </article>
+      <article class="leaderboard panel-dark">
+        <div class="leaderboard-title combo"><i data-lucide="flame"></i><span>連擊榜</span><small>最高連續答對</small></div>
+        <ol id="combo-list"></ol>
+      </article>
+      <article class="leaderboard panel-dark">
+        <div class="leaderboard-title accuracy"><i data-lucide="award"></i><span>準確榜</span><small>最少答 3 題</small></div>
+        <ol id="accuracy-list"></ol>
+      </article>
+      <article class="leaderboard warning-board panel-dark">
+        <div class="leaderboard-title warning"><i data-lucide="triangle-alert"></i><span>需要支援</span><small>教師關注</small></div>
+        <div id="warning-list" class="warning-list"></div>
+      </article>
+    </section>
+  </div>
+
+  <dialog id="reset-dialog" class="reset-dialog">
+    <form method="dialog">
+      <i data-lucide="triangle-alert"></i>
+      <h2>重置班級紀錄？</h2>
+      <p id="reset-dialog-copy">此操作會清除所選班級的作答紀錄。</p>
+      <div>
+        <button value="cancel" class="secondary-button">取消</button>
+        <button id="confirm-reset" value="confirm" class="danger-button">確定重置</button>
+      </div>
+    </form>
+  </dialog>
+</body>
+</html>
