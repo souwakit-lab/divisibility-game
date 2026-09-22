@@ -17,6 +17,7 @@ function doGet(e) {
     if (action === "getDashboardData") return jsonResponse(getCachedDashboardData_(e.parameter.className || ""));
     if (action === "loadRationalPlayer") return jsonResponse(loadRationalPlayer_(e.parameter.className, e.parameter.id));
     if (action === "getRationalDashboardData") return jsonResponse(getCachedRationalDashboardData_(e.parameter.className || ""));
+    if (action === "getRationalExportData") return jsonResponse(getRationalExportData_(e.parameter.className || ""));
     return jsonResponse({ ok: true, service: "divisibility-classroom", version: 1 });
   } catch (error) {
     return jsonResponse({ ok: false, error: error.message });
@@ -29,6 +30,13 @@ function doPost(e) {
   try {
     const payload = JSON.parse(e.parameter.data || "{}");
     const action = String(e.parameter.action || "");
+    if (action === "resetRational") {
+      const className = String(payload.className || "");
+      if (className && !RATIONAL_CLASSES.includes(className)) throw new Error("Invalid class");
+      resetRationalData_(ensureRationalSheets_(spreadsheet_()), className);
+      clearRationalDashboardCache_(className);
+      return jsonResponse({ ok: true });
+    }
     if (action === "saveRational") {
       validateRationalPayload_(payload);
       const spreadsheet = spreadsheet_();
@@ -167,8 +175,45 @@ function getCachedRationalDashboardData_(className) {
   return data;
 }
 
+function getRationalExportData_(className) {
+  if (className && !RATIONAL_CLASSES.includes(className)) throw new Error("Invalid class");
+  const sheets = ensureRationalSheets_(spreadsheet_());
+  const players = dataRows_(sheets.player, 10)
+    .filter((row) => !className || row[0] === className)
+    .map(rationalPlayerFromRow_);
+  const answers = dataRows_(sheets.answer, 9)
+    .filter((row) => !className || row[1] === className)
+    .map((row) => ({
+      timestamp: row[0] instanceof Date ? row[0].toISOString() : String(row[0] || ""),
+      className: row[1], id: Number(row[2]), name: row[3], level: Number(row[4]) || 1,
+      question: row[5], studentAnswer: row[6], correctAnswer: row[7], isCorrect: row[8] === "是",
+    }));
+  return { players, answers };
+}
+
+function resetRationalData_(sheets, className) {
+  rewriteRationalRows_(sheets.player, 10, (row) => className && row[0] !== className);
+  rewriteRationalRows_(sheets.answer, 9, (row) => className && row[1] !== className);
+  const states = dataRows_(sheets.classState, 4);
+  states.forEach((row, index) => {
+    if (!className || row[0] === className) {
+      sheets.classState.getRange(index + 2, 2, 1, 3).setValues([[RATIONAL_BOSS_HP, RATIONAL_BOSS_HP, new Date()]]);
+    }
+  });
+  SpreadsheetApp.flush();
+}
+
+function rewriteRationalRows_(sheet, columns, keepRow) {
+  const rows = dataRows_(sheet, columns).filter(keepRow);
+  const existingRows = Math.max(0, sheet.getLastRow() - 1);
+  if (existingRows) sheet.getRange(2, 1, existingRows, columns).clearContent();
+  if (rows.length) sheet.getRange(2, 1, rows.length, columns).setValues(rows);
+}
+
 function clearRationalDashboardCache_(className) {
-  CacheService.getScriptCache().removeAll([rationalDashboardCacheKey_(""), rationalDashboardCacheKey_(className)]);
+  const keys = [rationalDashboardCacheKey_(""), rationalDashboardCacheKey_(className)];
+  if (!className) RATIONAL_CLASSES.forEach((item) => keys.push(rationalDashboardCacheKey_(item)));
+  CacheService.getScriptCache().removeAll(keys);
 }
 
 function rationalDashboardCacheKey_(className) {
