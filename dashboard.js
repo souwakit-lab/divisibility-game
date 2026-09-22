@@ -3,6 +3,9 @@ const LOCAL_KEY = "divisibility-classroom-v1";
 
 let accuracyChart;
 let refreshTimer;
+let refreshInFlight = false;
+let refreshPending = false;
+const REFRESH_INTERVAL_MS = 8000;
 const $ = (id) => document.getElementById(id);
 
 function initDashboard() {
@@ -17,14 +20,19 @@ function initDashboard() {
   });
   if (window.lucide) lucide.createIcons();
   refreshData();
-  refreshTimer = window.setInterval(refreshData, 3000);
+  startRefreshTimer();
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) window.clearInterval(refreshTimer);
     else {
       refreshData();
-      refreshTimer = window.setInterval(refreshData, 3000);
+      startRefreshTimer();
     }
   });
+}
+
+function startRefreshTimer() {
+  window.clearInterval(refreshTimer);
+  refreshTimer = window.setInterval(refreshData, REFRESH_INTERVAL_MS);
 }
 
 function initChart() {
@@ -66,6 +74,11 @@ function initQrCode() {
 }
 
 async function refreshData() {
+  if (refreshInFlight) {
+    refreshPending = true;
+    return;
+  }
+  refreshInFlight = true;
   const className = $("class-filter").value;
   try {
     const data = API_URL ? await fetchRemoteData(className) : loadLocalData(className);
@@ -73,6 +86,12 @@ async function refreshData() {
   } catch (error) {
     console.error(error);
     $("updated-at").textContent = "資料連線中斷";
+  } finally {
+    refreshInFlight = false;
+    if (refreshPending) {
+      refreshPending = false;
+      refreshData();
+    }
   }
 }
 

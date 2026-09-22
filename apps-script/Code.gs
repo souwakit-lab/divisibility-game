@@ -3,12 +3,13 @@ const PLAYER_SHEET = "學生進度";
 const ANSWER_SHEET = "作答紀錄";
 const CLASS_SHEET = "班級狀態";
 const ALLOWED_CLASSES = ["高一甲", "高一乙", "高一丙", "高一丁"];
+const DASHBOARD_CACHE_SECONDS = 5;
 
 function doGet(e) {
   const action = String(e.parameter.action || "");
   try {
     if (action === "loadPlayer") return jsonResponse(loadPlayer_(e.parameter.className, e.parameter.id));
-    if (action === "getDashboardData") return jsonResponse(getDashboardData_(e.parameter.className || ""));
+    if (action === "getDashboardData") return jsonResponse(getCachedDashboardData_(e.parameter.className || ""));
     return jsonResponse({ ok: true, service: "divisibility-classroom", version: 1 });
   } catch (error) {
     return jsonResponse({ ok: false, error: error.message });
@@ -21,9 +22,12 @@ function doPost(e) {
   try {
     const payload = JSON.parse(e.parameter.data || "{}");
     validatePayload_(payload);
-    savePlayer_(payload);
-    appendAnswers_(payload);
-    updateBoss_(payload.className, Number(payload.addedDamage) || 0);
+    const spreadsheet = spreadsheet_();
+    savePlayer_(spreadsheet.getSheetByName(PLAYER_SHEET), payload);
+    appendAnswers_(spreadsheet.getSheetByName(ANSWER_SHEET), payload);
+    updateBoss_(spreadsheet.getSheetByName(CLASS_SHEET), payload.className, Number(payload.addedDamage) || 0);
+    SpreadsheetApp.flush();
+    clearDashboardCache_(payload.className);
     return jsonResponse({ ok: true });
   } catch (error) {
     return jsonResponse({ ok: false, error: error.message });
@@ -41,11 +45,12 @@ function spreadsheet_() {
 }
 
 function loadPlayer_(className, studentId) {
-  const sheet = spreadsheet_().getSheetByName(PLAYER_SHEET);
+  const spreadsheet = spreadsheet_();
+  const sheet = spreadsheet.getSheetByName(PLAYER_SHEET);
   const rows = dataRows_(sheet, 12);
   const id = Number(studentId);
   const row = rows.find((item) => item[0] === className && Number(item[1]) === id);
-  const classState = getClassState_(className);
+  const classState = getClassState_(spreadsheet.getSheetByName(CLASS_SHEET), className);
   return {
     player: row ? playerFromRow_(row) : null,
     bossHp: classState.bossHp,
@@ -54,10 +59,11 @@ function loadPlayer_(className, studentId) {
 }
 
 function getDashboardData_(className) {
-  const players = dataRows_(spreadsheet_().getSheetByName(PLAYER_SHEET), 12)
+  const spreadsheet = spreadsheet_();
+  const players = dataRows_(spreadsheet.getSheetByName(PLAYER_SHEET), 12)
     .filter((row) => !className || row[0] === className)
     .map(playerFromRow_);
-  const states = dataRows_(spreadsheet_().getSheetByName(CLASS_SHEET), 4)
+  const states = dataRows_(spreadsheet.getSheetByName(CLASS_SHEET), 4)
     .filter((row) => !className || row[0] === className);
   return {
     players,
@@ -66,8 +72,25 @@ function getDashboardData_(className) {
   };
 }
 
-function savePlayer_(payload) {
-  const sheet = spreadsheet_().getSheetByName(PLAYER_SHEET);
+function getCachedDashboardData_(className) {
+  const cache = CacheService.getScriptCache();
+  const key = dashboardCacheKey_(className);
+  const cached = cache.get(key);
+  if (cached) return JSON.parse(cached);
+  const data = getDashboardData_(className);
+  cache.put(key, JSON.stringify(data), DASHBOARD_CACHE_SECONDS);
+  return data;
+}
+
+function clearDashboardCache_(className) {
+  CacheService.getScriptCache().removeAll([dashboardCacheKey_(""), dashboardCacheKey_(className)]);
+}
+
+function dashboardCacheKey_(className) {
+  return `dashboard:${encodeURIComponent(className || "all")}`;
+}
+
+function savePlayer_(sheet, payload) {
   const rows = dataRows_(sheet, 12);
   const rowIndex = rows.findIndex((row) => row[0] === payload.className && Number(row[1]) === Number(payload.id));
   const values = [[
@@ -88,7 +111,7 @@ function savePlayer_(payload) {
   else sheet.getRange(sheet.getLastRow() + 1, 1, 1, 12).setValues(values);
 }
 
-function appendAnswers_(payload) {
+function appendAnswers_(sheet, payload) {
   const answers = Array.isArray(payload.answers) ? payload.answers.slice(0, 10) : [];
   if (!answers.length) return;
   const rows = answers.map((answer) => [
@@ -105,26 +128,25 @@ function appendAnswers_(payload) {
     Number(answer.timeTaken) || 0,
     answer.usedHint ? "有" : "無",
   ]);
-  const sheet = spreadsheet_().getSheetByName(ANSWER_SHEET);
   sheet.getRange(sheet.getLastRow() + 1, 1, rows.length, 12).setValues(rows);
 }
 
-function updateBoss_(className, damage) {
-  const sheet = spreadsheet_().getSheetByName(CLASS_SHEET);
+function updateBoss_(sheet, className, damage) {
   const rows = dataRows_(sheet, 4);
   let index = rows.findIndex((row) => row[0] === className);
   if (index < 0) {
     sheet.appendRow([className, 10000, 10000, new Date()]);
-    index = sheet.getLastRow() - 2;
+    return;
   }
   const row = index + 2;
-  const current = Number(sheet.getRange(row, 2).getValue()) || 10000;
+  const current = Number(rows[index][1]) || 10000;
+  const maximum = Number(rows[index][2]) || 10000;
   const safeDamage = clamp_(damage, 0, 1000);
-  sheet.getRange(row, 2, 1, 3).setValues([[Math.max(0, current - safeDamage), Number(sheet.getRange(row, 3).getValue()) || 10000, new Date()]]);
+  sheet.getRange(row, 2, 1, 3).setValues([[Math.max(0, current - safeDamage), maximum, new Date()]]);
 }
 
-function getClassState_(className) {
-  const rows = dataRows_(spreadsheet_().getSheetByName(CLASS_SHEET), 4);
+function getClassState_(sheet, className) {
+  const rows = dataRows_(sheet, 4);
   const row = rows.find((item) => item[0] === className);
   return { bossHp: Number(row && row[1]) || 10000, bossMaxHp: Number(row && row[2]) || 10000 };
 }

@@ -1,5 +1,7 @@
 const API_URL = window.DIVISIBILITY_CONFIG?.apiUrl || "";
 const LOCAL_KEY = "divisibility-classroom-v1";
+let syncInFlight = false;
+let syncQueued = false;
 
 const studentDB = {
   "高一甲": { 1: "高斯", 2: "歐拉", 3: "牛頓", 4: "笛卡兒", 5: "費馬" },
@@ -319,7 +321,15 @@ function updateUI() {
   $("boss-bar").style.width = `${Math.max(0, (state.bossHp / state.bossMaxHp) * 100)}%`;
 }
 
-async function syncNow() {
+function syncNow() {
+  syncQueued = true;
+  if (!syncInFlight) flushSyncQueue();
+}
+
+async function flushSyncQueue() {
+  if (syncInFlight || !syncQueued || !state.player) return;
+  syncInFlight = true;
+  syncQueued = false;
   const answers = state.pendingAnswers.splice(0);
   const addedDamage = state.pendingDamage;
   state.pendingDamage = 0;
@@ -341,6 +351,8 @@ async function syncNow() {
 
   if (!API_URL) {
     saveLocalPayload(payload);
+    syncInFlight = false;
+    if (syncQueued || state.pendingAnswers.length || state.pendingDamage) flushSyncQueue();
     return;
   }
   try {
@@ -354,6 +366,11 @@ async function syncNow() {
     state.pendingDamage += addedDamage;
     state.pendingAnswers.unshift(...answers);
     console.error("Sync failed", error);
+  } finally {
+    syncInFlight = false;
+    if (syncQueued || state.pendingAnswers.length || state.pendingDamage) {
+      window.setTimeout(flushSyncQueue, 250);
+    }
   }
 }
 
