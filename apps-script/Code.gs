@@ -4,12 +4,19 @@ const ANSWER_SHEET = "作答紀錄";
 const CLASS_SHEET = "班級狀態";
 const ALLOWED_CLASSES = ["高一甲", "高一乙", "高一丙", "高一丁"];
 const DASHBOARD_CACHE_SECONDS = 5;
+const RATIONAL_PLAYER_SHEET = "有理數學生進度";
+const RATIONAL_ANSWER_SHEET = "有理數作答紀錄";
+const RATIONAL_CLASS_SHEET = "有理數班級狀態";
+const RATIONAL_BOSS_HP = 12000;
+const RATIONAL_CLASSES = ["SG1A", "SG1B"];
 
 function doGet(e) {
   const action = String(e.parameter.action || "");
   try {
     if (action === "loadPlayer") return jsonResponse(loadPlayer_(e.parameter.className, e.parameter.id));
     if (action === "getDashboardData") return jsonResponse(getCachedDashboardData_(e.parameter.className || ""));
+    if (action === "loadRationalPlayer") return jsonResponse(loadRationalPlayer_(e.parameter.className, e.parameter.id));
+    if (action === "getRationalDashboardData") return jsonResponse(getCachedRationalDashboardData_(e.parameter.className || ""));
     return jsonResponse({ ok: true, service: "divisibility-classroom", version: 1 });
   } catch (error) {
     return jsonResponse({ ok: false, error: error.message });
@@ -21,6 +28,18 @@ function doPost(e) {
   lock.waitLock(15000);
   try {
     const payload = JSON.parse(e.parameter.data || "{}");
+    const action = String(e.parameter.action || "");
+    if (action === "saveRational") {
+      validateRationalPayload_(payload);
+      const spreadsheet = spreadsheet_();
+      const sheets = ensureRationalSheets_(spreadsheet);
+      saveRationalPlayer_(sheets.player, payload);
+      appendRationalAnswers_(sheets.answer, payload);
+      updateRationalBoss_(sheets.classState, payload.className, Number(payload.addedDamage) || 0);
+      SpreadsheetApp.flush();
+      clearRationalDashboardCache_(payload.className);
+      return jsonResponse({ ok: true });
+    }
     validatePayload_(payload);
     const spreadsheet = spreadsheet_();
     savePlayer_(spreadsheet.getSheetByName(PLAYER_SHEET), payload);
@@ -88,6 +107,122 @@ function clearDashboardCache_(className) {
 
 function dashboardCacheKey_(className) {
   return `dashboard:${encodeURIComponent(className || "all")}`;
+}
+
+function ensureRationalSheets_(spreadsheet) {
+  let player = spreadsheet.getSheetByName(RATIONAL_PLAYER_SHEET);
+  let answer = spreadsheet.getSheetByName(RATIONAL_ANSWER_SHEET);
+  let classState = spreadsheet.getSheetByName(RATIONAL_CLASS_SHEET);
+  if (!player) {
+    player = spreadsheet.insertSheet(RATIONAL_PLAYER_SHEET);
+    player.appendRow(["班別", "學號", "姓名", "程度", "經驗", "作答數", "答對數", "連勝", "連錯", "最後上線"]);
+    player.setFrozenRows(1);
+  }
+  if (!answer) {
+    answer = spreadsheet.insertSheet(RATIONAL_ANSWER_SHEET);
+    answer.appendRow(["時間", "班別", "學號", "姓名", "程度", "題目", "學生答案", "正確答案", "是否正確"]);
+    answer.setFrozenRows(1);
+  }
+  if (!classState) {
+    classState = spreadsheet.insertSheet(RATIONAL_CLASS_SHEET);
+    classState.appendRow(["班別", "首領能量", "能量上限", "最後更新"]);
+    RATIONAL_CLASSES.forEach((className) => classState.appendRow([className, RATIONAL_BOSS_HP, RATIONAL_BOSS_HP, new Date()]));
+    classState.setFrozenRows(1);
+  }
+  return { player, answer, classState };
+}
+
+function loadRationalPlayer_(className, studentId) {
+  const sheets = ensureRationalSheets_(spreadsheet_());
+  const id = Number(studentId);
+  const row = dataRows_(sheets.player, 10).find((item) => item[0] === className && Number(item[1]) === id);
+  const classRow = dataRows_(sheets.classState, 4).find((item) => item[0] === className);
+  return {
+    player: row ? rationalPlayerFromRow_(row) : null,
+    bossHp: classRow && Number.isFinite(Number(classRow[1])) ? Number(classRow[1]) : RATIONAL_BOSS_HP,
+    bossMaxHp: classRow && Number.isFinite(Number(classRow[2])) ? Number(classRow[2]) : RATIONAL_BOSS_HP,
+  };
+}
+
+function getRationalDashboardData_(className) {
+  const sheets = ensureRationalSheets_(spreadsheet_());
+  const players = dataRows_(sheets.player, 10)
+    .filter((row) => !className || row[0] === className)
+    .map(rationalPlayerFromRow_);
+  const states = dataRows_(sheets.classState, 4).filter((row) => !className || row[0] === className);
+  return {
+    players,
+    bossHp: states.reduce((sum, row) => sum + (Number(row[1]) || 0), 0),
+    bossMaxHp: states.reduce((sum, row) => sum + (Number(row[2]) || RATIONAL_BOSS_HP), 0) || RATIONAL_BOSS_HP,
+  };
+}
+
+function getCachedRationalDashboardData_(className) {
+  const cache = CacheService.getScriptCache();
+  const key = rationalDashboardCacheKey_(className);
+  const cached = cache.get(key);
+  if (cached) return JSON.parse(cached);
+  const data = getRationalDashboardData_(className);
+  cache.put(key, JSON.stringify(data), DASHBOARD_CACHE_SECONDS);
+  return data;
+}
+
+function clearRationalDashboardCache_(className) {
+  CacheService.getScriptCache().removeAll([rationalDashboardCacheKey_(""), rationalDashboardCacheKey_(className)]);
+}
+
+function rationalDashboardCacheKey_(className) {
+  return `rational-dashboard:${encodeURIComponent(className || "all")}`;
+}
+
+function saveRationalPlayer_(sheet, payload) {
+  const rows = dataRows_(sheet, 10);
+  const rowIndex = rows.findIndex((row) => row[0] === payload.className && Number(row[1]) === Number(payload.id));
+  const values = [[
+    safeText_(payload.className, 12), Number(payload.id), safeText_(payload.name, 30),
+    clamp_(Number(payload.level) || 1, 1, 3), clamp_(Number(payload.xp) || 0, 0, 300),
+    clamp_(Number(payload.total) || 0, 0, 1000000), clamp_(Number(payload.correct) || 0, 0, 1000000),
+    clamp_(Number(payload.streak) || 0, 0, 100000), clamp_(Number(payload.mistakes) || 0, 0, 1000), new Date(),
+  ]];
+  if (rowIndex >= 0) sheet.getRange(rowIndex + 2, 1, 1, 10).setValues(values);
+  else sheet.getRange(sheet.getLastRow() + 1, 1, 1, 10).setValues(values);
+}
+
+function appendRationalAnswers_(sheet, payload) {
+  const answers = Array.isArray(payload.answers) ? payload.answers.slice(0, 10) : [];
+  if (!answers.length) return;
+  const rows = answers.map((answer) => [
+    new Date(), safeText_(payload.className, 12), Number(payload.id), safeText_(payload.name, 30),
+    clamp_(Number(answer.level) || 1, 1, 3), safeText_(answer.question, 180),
+    safeText_(answer.studentAnswer, 80), safeText_(answer.correctAnswer, 80), answer.isCorrect ? "是" : "否",
+  ]);
+  sheet.getRange(sheet.getLastRow() + 1, 1, rows.length, 9).setValues(rows);
+}
+
+function updateRationalBoss_(sheet, className, damage) {
+  const rows = dataRows_(sheet, 4);
+  const index = rows.findIndex((row) => row[0] === className);
+  if (index < 0) return;
+  const current = Number(rows[index][1]) || RATIONAL_BOSS_HP;
+  const maximum = Number(rows[index][2]) || RATIONAL_BOSS_HP;
+  sheet.getRange(index + 2, 2, 1, 3).setValues([[Math.max(0, current - clamp_(damage, 0, 100)), maximum, new Date()]]);
+}
+
+function rationalPlayerFromRow_(row) {
+  const total = Number(row[5]) || 0;
+  const correct = Number(row[6]) || 0;
+  return {
+    className: row[0], id: Number(row[1]), name: row[2], level: Number(row[3]) || 1,
+    xp: Number(row[4]) || 0, total, correct, streak: Number(row[7]) || 0,
+    mistakes: Number(row[8]) || 0, accuracy: total ? correct / total : 0,
+  };
+}
+
+function validateRationalPayload_(payload) {
+  if (!RATIONAL_CLASSES.includes(payload.className)) throw new Error("Invalid class");
+  const id = Number(payload.id);
+  if (!Number.isInteger(id) || id < 1 || id > 34 || (payload.className === "SG1B" && id === 29)) throw new Error("Invalid student id");
+  if (!payload.name || String(payload.name).length > 30) throw new Error("Invalid player name");
 }
 
 function savePlayer_(sheet, payload) {
