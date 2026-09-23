@@ -7,7 +7,7 @@ const DASHBOARD_CACHE_SECONDS = 5;
 const RATIONAL_PLAYER_SHEET = "有理數學生進度";
 const RATIONAL_ANSWER_SHEET = "有理數作答紀錄";
 const RATIONAL_CLASS_SHEET = "有理數班級狀態";
-const RATIONAL_BOSS_HP = 12000;
+const RATIONAL_BOSS_HP = 50000;
 const RATIONAL_CLASSES = ["SG1A", "SG1B"];
 
 function doGet(e) {
@@ -145,10 +145,11 @@ function loadRationalPlayer_(className, studentId) {
   const id = Number(studentId);
   const row = dataRows_(sheets.player, 10).find((item) => item[0] === className && Number(item[1]) === id);
   const classRow = dataRows_(sheets.classState, 4).find((item) => item[0] === className);
+  const classState = rationalStateValues_(classRow);
   return {
     player: row ? rationalPlayerFromRow_(row) : null,
-    bossHp: classRow && Number.isFinite(Number(classRow[1])) ? Number(classRow[1]) : RATIONAL_BOSS_HP,
-    bossMaxHp: classRow && Number.isFinite(Number(classRow[2])) ? Number(classRow[2]) : RATIONAL_BOSS_HP,
+    bossHp: classState.bossHp,
+    bossMaxHp: classState.bossMaxHp,
   };
 }
 
@@ -157,11 +158,25 @@ function getRationalDashboardData_(className) {
   const players = dataRows_(sheets.player, 10)
     .filter((row) => !className || row[0] === className)
     .map(rationalPlayerFromRow_);
-  const states = dataRows_(sheets.classState, 4).filter((row) => !className || row[0] === className);
+  const states = dataRows_(sheets.classState, 4)
+    .filter((row) => !className || row[0] === className)
+    .map(rationalStateValues_);
+  const answerRows = dataRows_(sheets.answer, 9).filter((row) => !className || row[1] === className);
+  const levelStats = [1, 2, 3, 4].map((level) => ({ level, total: 0, correct: 0, accuracy: 0 }));
+  answerRows.forEach((row) => {
+    const level = clamp_(Number(row[4]) || 1, 1, 4);
+    const stats = levelStats[level - 1];
+    stats.total += 1;
+    if (row[8] === "是") stats.correct += 1;
+  });
+  levelStats.forEach((stats) => {
+    stats.accuracy = stats.total ? stats.correct / stats.total : 0;
+  });
   return {
     players,
-    bossHp: states.reduce((sum, row) => sum + (Number(row[1]) || 0), 0),
-    bossMaxHp: states.reduce((sum, row) => sum + (Number(row[2]) || RATIONAL_BOSS_HP), 0) || RATIONAL_BOSS_HP,
+    levelStats,
+    bossHp: states.reduce((sum, state) => sum + state.bossHp, 0),
+    bossMaxHp: states.reduce((sum, state) => sum + state.bossMaxHp, 0) || RATIONAL_BOSS_HP,
   };
 }
 
@@ -225,7 +240,7 @@ function saveRationalPlayer_(sheet, payload) {
   const rowIndex = rows.findIndex((row) => row[0] === payload.className && Number(row[1]) === Number(payload.id));
   const values = [[
     safeText_(payload.className, 12), Number(payload.id), safeText_(payload.name, 30),
-    clamp_(Number(payload.level) || 1, 1, 3), clamp_(Number(payload.xp) || 0, 0, 300),
+    clamp_(Number(payload.level) || 1, 1, 4), clamp_(Number(payload.xp) || 0, 0, 500),
     clamp_(Number(payload.total) || 0, 0, 1000000), clamp_(Number(payload.correct) || 0, 0, 1000000),
     clamp_(Number(payload.streak) || 0, 0, 100000), clamp_(Number(payload.mistakes) || 0, 0, 1000), new Date(),
   ]];
@@ -238,7 +253,7 @@ function appendRationalAnswers_(sheet, payload) {
   if (!answers.length) return;
   const rows = answers.map((answer) => [
     new Date(), safeText_(payload.className, 12), Number(payload.id), safeText_(payload.name, 30),
-    clamp_(Number(answer.level) || 1, 1, 3), safeText_(answer.question, 180),
+    clamp_(Number(answer.level) || 1, 1, 4), safeText_(answer.question, 180),
     safeText_(answer.studentAnswer, 80), safeText_(answer.correctAnswer, 80), answer.isCorrect ? "是" : "否",
   ]);
   sheet.getRange(sheet.getLastRow() + 1, 1, rows.length, 9).setValues(rows);
@@ -248,9 +263,20 @@ function updateRationalBoss_(sheet, className, damage) {
   const rows = dataRows_(sheet, 4);
   const index = rows.findIndex((row) => row[0] === className);
   if (index < 0) return;
-  const current = Number(rows[index][1]) || RATIONAL_BOSS_HP;
-  const maximum = Number(rows[index][2]) || RATIONAL_BOSS_HP;
-  sheet.getRange(index + 2, 2, 1, 3).setValues([[Math.max(0, current - clamp_(damage, 0, 100)), maximum, new Date()]]);
+  const state = rationalStateValues_(rows[index]);
+  sheet.getRange(index + 2, 2, 1, 3).setValues([[Math.max(0, state.bossHp - clamp_(damage, 0, 100)), state.bossMaxHp, new Date()]]);
+}
+
+function rationalStateValues_(row) {
+  if (!row) return { bossHp: RATIONAL_BOSS_HP, bossMaxHp: RATIONAL_BOSS_HP };
+  const previousMax = Math.max(1, Number(row[2]) || RATIONAL_BOSS_HP);
+  const rawHp = Number(row[1]);
+  const previousHp = Math.max(0, Math.min(previousMax, Number.isFinite(rawHp) ? rawHp : previousMax));
+  const damageDealt = previousMax - previousHp;
+  return {
+    bossHp: Math.max(0, RATIONAL_BOSS_HP - damageDealt),
+    bossMaxHp: RATIONAL_BOSS_HP,
+  };
 }
 
 function rationalPlayerFromRow_(row) {
