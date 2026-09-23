@@ -144,10 +144,12 @@ function loadRationalPlayer_(className, studentId) {
   const sheets = ensureRationalSheets_(spreadsheet_());
   const id = Number(studentId);
   const row = dataRows_(sheets.player, 10).find((item) => item[0] === className && Number(item[1]) === id);
+  const answerRows = dataRows_(sheets.answer, 9).filter((item) => item[1] === className && Number(item[2]) === id);
   const classRow = dataRows_(sheets.classState, 4).find((item) => item[0] === className);
   const classState = rationalStateValues_(classRow);
   return {
     player: row ? rationalPlayerFromRow_(row) : null,
+    levelStats: rationalLevelStats_(answerRows),
     bossHp: classState.bossHp,
     bossMaxHp: classState.bossMaxHp,
   };
@@ -162,22 +164,32 @@ function getRationalDashboardData_(className) {
     .filter((row) => !className || row[0] === className)
     .map(rationalStateValues_);
   const answerRows = dataRows_(sheets.answer, 9).filter((row) => !className || row[1] === className);
-  const levelStats = [1, 2, 3, 4].map((level) => ({ level, total: 0, correct: 0, accuracy: 0 }));
-  answerRows.forEach((row) => {
-    const level = clamp_(Number(row[4]) || 1, 1, 4);
-    const stats = levelStats[level - 1];
-    stats.total += 1;
-    if (row[8] === "是") stats.correct += 1;
-  });
-  levelStats.forEach((stats) => {
-    stats.accuracy = stats.total ? stats.correct / stats.total : 0;
-  });
+  const levelStats = rationalLevelStats_(answerRows);
   return {
     players,
     levelStats,
     bossHp: states.reduce((sum, state) => sum + state.bossHp, 0),
     bossMaxHp: states.reduce((sum, state) => sum + state.bossMaxHp, 0) || RATIONAL_BOSS_HP,
   };
+}
+
+function rationalLevelStats_(answerRows) {
+  const levelStats = [1, 2, 3, 4].map((level) => ({ level, total: 0, correct: 0, streak: 0, accuracy: 0 }));
+  answerRows.forEach((row) => {
+    const level = clamp_(Number(row[4]) || 1, 1, 4);
+    const stats = levelStats[level - 1];
+    stats.total += 1;
+    if (row[8] === "是") {
+      stats.correct += 1;
+      stats.streak += 1;
+    } else {
+      stats.streak = 0;
+    }
+  });
+  levelStats.forEach((stats) => {
+    stats.accuracy = stats.total ? stats.correct / stats.total : 0;
+  });
+  return levelStats;
 }
 
 function getCachedRationalDashboardData_(className) {
