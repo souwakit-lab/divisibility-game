@@ -12,6 +12,7 @@ const RATIONAL_CLASSES = ["SG1A", "SG1B"];
 const RATIONAL_MULDIV_PLAYER_SHEET = "有理數乘除學生進度";
 const RATIONAL_MULDIV_ANSWER_SHEET = "有理數乘除作答紀錄";
 const RATIONAL_MULDIV_CLASS_SHEET = "有理數乘除班級狀態";
+const RATIONAL_MULDIV_BOSS_HP = 300000;
 
 function doGet(e) {
   const action = String(e.parameter.action || "");
@@ -24,6 +25,7 @@ function doGet(e) {
     if (action === "loadRationalMulDivPlayer") return jsonResponse(loadRationalMulDivPlayer_(e.parameter.className, e.parameter.id));
     if (action === "getRationalMulDivDashboardData") return jsonResponse(getCachedRationalMulDivDashboardData_(e.parameter.className || ""));
     if (action === "getRationalMulDivExportData") return jsonResponse(getRationalMulDivExportData_(e.parameter.className || ""));
+    if (action === "getRationalMulDivStudentExportData") return jsonResponse(getRationalMulDivStudentExportData_(e.parameter.className, e.parameter.id));
     return jsonResponse({ ok: true, service: "divisibility-classroom", version: 1 });
   } catch (error) {
     return jsonResponse({ ok: false, error: error.message });
@@ -39,7 +41,7 @@ function doPost(e) {
     if (action === "resetRationalMulDiv") {
       const className = String(payload.className || "");
       if (className && !RATIONAL_CLASSES.includes(className)) throw new Error("Invalid class");
-      resetRationalData_(ensureRationalMulDivSheets_(spreadsheet_()), className);
+      resetRationalMulDivData_(ensureRationalMulDivSheets_(spreadsheet_()), className);
       clearRationalMulDivDashboardCache_(className);
       return jsonResponse({ ok: true });
     }
@@ -49,7 +51,7 @@ function doPost(e) {
       const sheets = ensureRationalMulDivSheets_(spreadsheet);
       saveRationalMulDivPlayer_(sheets.player, payload);
       appendRationalMulDivAnswers_(sheets.answer, payload);
-      updateRationalBoss_(sheets.classState, payload.className, Number(payload.addedDamage) || 0);
+      updateRationalMulDivBoss_(sheets.classState, payload.className, Number(payload.addedDamage) || 0);
       SpreadsheetApp.flush();
       clearRationalMulDivDashboardCache_(payload.className);
       return jsonResponse({ ok: true });
@@ -158,7 +160,7 @@ function ensureRationalSheets_(spreadsheet) {
   if (!classState) {
     classState = spreadsheet.insertSheet(RATIONAL_CLASS_SHEET);
     classState.appendRow(["班別", "首領能量", "能量上限", "最後更新"]);
-    RATIONAL_CLASSES.forEach((className) => classState.appendRow([className, RATIONAL_BOSS_HP, RATIONAL_BOSS_HP, new Date()]));
+    RATIONAL_CLASSES.forEach((className) => classState.appendRow([className, RATIONAL_MULDIV_BOSS_HP, RATIONAL_MULDIV_BOSS_HP, new Date()]));
     classState.setFrozenRows(1);
   }
   return { player, answer, classState };
@@ -170,7 +172,7 @@ function loadRationalPlayer_(className, studentId) {
   const row = dataRows_(sheets.player, 10).find((item) => item[0] === className && Number(item[1]) === id);
   const answerRows = dataRows_(sheets.answer, 9).filter((item) => item[1] === className && Number(item[2]) === id);
   const classRow = dataRows_(sheets.classState, 4).find((item) => item[0] === className);
-  const classState = rationalStateValues_(classRow);
+  const classState = rationalMulDivStateValues_(classRow);
   return {
     player: row ? rationalPlayerFromRow_(row) : null,
     levelStats: rationalLevelStats_(answerRows),
@@ -186,14 +188,14 @@ function getRationalDashboardData_(className) {
     .map(rationalPlayerFromRow_);
   const states = dataRows_(sheets.classState, 4)
     .filter((row) => !className || row[0] === className)
-    .map(rationalStateValues_);
+    .map(rationalMulDivStateValues_);
   const answerRows = dataRows_(sheets.answer, 9).filter((row) => !className || row[1] === className);
   const levelStats = rationalLevelStats_(answerRows);
   return {
     players,
     levelStats,
     bossHp: states.reduce((sum, state) => sum + state.bossHp, 0),
-    bossMaxHp: states.reduce((sum, state) => sum + state.bossMaxHp, 0) || RATIONAL_BOSS_HP,
+    bossMaxHp: states.reduce((sum, state) => sum + state.bossMaxHp, 0) || RATIONAL_MULDIV_BOSS_HP,
   };
 }
 
@@ -350,6 +352,57 @@ function getRationalMulDivExportData_(className) {
       question: row[5], studentAnswer: row[6], correctAnswer: row[7], isCorrect: row[8] === "是",
     }));
   return { players, answers };
+}
+
+function getRationalMulDivStudentExportData_(className, studentId) {
+  if (!RATIONAL_CLASSES.includes(className)) throw new Error("Invalid class");
+  const id = Number(studentId);
+  if (!Number.isInteger(id) || id < 1 || id > 34 || (className === "SG1B" && id === 29)) throw new Error("Invalid student id");
+  const sheets = ensureRationalMulDivSheets_(spreadsheet_());
+  const row = dataRows_(sheets.player, 10).find((item) => item[0] === className && Number(item[1]) === id);
+  const answerRows = dataRows_(sheets.answer, 9).filter((item) => item[1] === className && Number(item[2]) === id);
+  const wrongAnswers = answerRows.filter((item) => item[8] !== "是").map((item) => ({
+    timestamp: item[0] instanceof Date ? item[0].toISOString() : String(item[0] || ""),
+    level: Number(item[4]) || 1,
+    question: item[5], studentAnswer: item[6], correctAnswer: item[7],
+  }));
+  return {
+    player: row ? rationalPlayerFromRow_(row) : null,
+    levelStats: rationalLevelStats_(answerRows),
+    wrongAnswers,
+  };
+}
+
+function resetRationalMulDivData_(sheets, className) {
+  rewriteRationalRows_(sheets.player, 10, (row) => className && row[0] !== className);
+  rewriteRationalRows_(sheets.answer, 9, (row) => className && row[1] !== className);
+  const states = dataRows_(sheets.classState, 4);
+  states.forEach((row, index) => {
+    if (!className || row[0] === className) {
+      sheets.classState.getRange(index + 2, 2, 1, 3).setValues([[RATIONAL_MULDIV_BOSS_HP, RATIONAL_MULDIV_BOSS_HP, new Date()]]);
+    }
+  });
+  SpreadsheetApp.flush();
+}
+
+function updateRationalMulDivBoss_(sheet, className, damage) {
+  const rows = dataRows_(sheet, 4);
+  const index = rows.findIndex((row) => row[0] === className);
+  if (index < 0) return;
+  const state = rationalMulDivStateValues_(rows[index]);
+  sheet.getRange(index + 2, 2, 1, 3).setValues([[Math.max(0, state.bossHp - clamp_(damage, 0, 100)), state.bossMaxHp, new Date()]]);
+}
+
+function rationalMulDivStateValues_(row) {
+  if (!row) return { bossHp: RATIONAL_MULDIV_BOSS_HP, bossMaxHp: RATIONAL_MULDIV_BOSS_HP };
+  const previousMax = Math.max(1, Number(row[2]) || RATIONAL_MULDIV_BOSS_HP);
+  const rawHp = Number(row[1]);
+  const previousHp = Math.max(0, Math.min(previousMax, Number.isFinite(rawHp) ? rawHp : previousMax));
+  const damageDealt = previousMax - previousHp;
+  return {
+    bossHp: Math.max(0, RATIONAL_MULDIV_BOSS_HP - damageDealt),
+    bossMaxHp: RATIONAL_MULDIV_BOSS_HP,
+  };
 }
 
 function clearRationalMulDivDashboardCache_(className) {
