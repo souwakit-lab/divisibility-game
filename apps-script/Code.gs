@@ -160,7 +160,7 @@ function ensureRationalSheets_(spreadsheet) {
   if (!classState) {
     classState = spreadsheet.insertSheet(RATIONAL_CLASS_SHEET);
     classState.appendRow(["班別", "首領能量", "能量上限", "最後更新"]);
-    RATIONAL_CLASSES.forEach((className) => classState.appendRow([className, RATIONAL_MULDIV_BOSS_HP, RATIONAL_MULDIV_BOSS_HP, new Date()]));
+    RATIONAL_CLASSES.forEach((className) => classState.appendRow([className, RATIONAL_BOSS_HP, RATIONAL_BOSS_HP, new Date()]));
     classState.setFrozenRows(1);
   }
   return { player, answer, classState };
@@ -172,7 +172,7 @@ function loadRationalPlayer_(className, studentId) {
   const row = dataRows_(sheets.player, 10).find((item) => item[0] === className && Number(item[1]) === id);
   const answerRows = dataRows_(sheets.answer, 9).filter((item) => item[1] === className && Number(item[2]) === id);
   const classRow = dataRows_(sheets.classState, 4).find((item) => item[0] === className);
-  const classState = rationalMulDivStateValues_(classRow);
+  const classState = rationalStateValues_(classRow);
   return {
     player: row ? rationalPlayerFromRow_(row) : null,
     levelStats: rationalLevelStats_(answerRows),
@@ -188,14 +188,14 @@ function getRationalDashboardData_(className) {
     .map(rationalPlayerFromRow_);
   const states = dataRows_(sheets.classState, 4)
     .filter((row) => !className || row[0] === className)
-    .map(rationalMulDivStateValues_);
+    .map(rationalStateValues_);
   const answerRows = dataRows_(sheets.answer, 9).filter((row) => !className || row[1] === className);
   const levelStats = rationalLevelStats_(answerRows);
   return {
     players,
     levelStats,
     bossHp: states.reduce((sum, state) => sum + state.bossHp, 0),
-    bossMaxHp: states.reduce((sum, state) => sum + state.bossMaxHp, 0) || RATIONAL_MULDIV_BOSS_HP,
+    bossMaxHp: states.reduce((sum, state) => sum + state.bossMaxHp, 0) || RATIONAL_BOSS_HP,
   };
 }
 
@@ -290,7 +290,7 @@ function ensureRationalMulDivSheets_(spreadsheet) {
   if (!classState) {
     classState = spreadsheet.insertSheet(RATIONAL_MULDIV_CLASS_SHEET);
     classState.appendRow(["班別", "首領能量", "能量上限", "最後更新"]);
-    RATIONAL_CLASSES.forEach((className) => classState.appendRow([className, RATIONAL_BOSS_HP, RATIONAL_BOSS_HP, new Date()]));
+    RATIONAL_CLASSES.forEach((className) => classState.appendRow([className, RATIONAL_MULDIV_BOSS_HP, RATIONAL_MULDIV_BOSS_HP, new Date()]));
     classState.setFrozenRows(1);
   }
   return { player, answer, classState };
@@ -302,7 +302,7 @@ function loadRationalMulDivPlayer_(className, studentId) {
   const row = dataRows_(sheets.player, 10).find((item) => item[0] === className && Number(item[1]) === id);
   const answerRows = dataRows_(sheets.answer, 9).filter((item) => item[1] === className && Number(item[2]) === id);
   const classRow = dataRows_(sheets.classState, 4).find((item) => item[0] === className);
-  const classState = rationalStateValues_(classRow);
+  const classState = rationalMulDivStateValues_(classRow);
   return {
     player: row ? rationalPlayerFromRow_(row) : null,
     levelStats: rationalLevelStats_(answerRows),
@@ -318,13 +318,13 @@ function getRationalMulDivDashboardData_(className) {
     .map(rationalPlayerFromRow_);
   const states = dataRows_(sheets.classState, 4)
     .filter((row) => !className || row[0] === className)
-    .map(rationalStateValues_);
+    .map(rationalMulDivStateValues_);
   const answerRows = dataRows_(sheets.answer, 9).filter((row) => !className || row[1] === className);
   return {
     players,
     levelStats: rationalLevelStats_(answerRows),
     bossHp: states.reduce((sum, state) => sum + state.bossHp, 0),
-    bossMaxHp: states.reduce((sum, state) => sum + state.bossMaxHp, 0) || RATIONAL_BOSS_HP,
+    bossMaxHp: states.reduce((sum, state) => sum + state.bossMaxHp, 0) || RATIONAL_MULDIV_BOSS_HP,
   };
 }
 
