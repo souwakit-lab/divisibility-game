@@ -9,6 +9,9 @@ const RATIONAL_ANSWER_SHEET = "有理數作答紀錄";
 const RATIONAL_CLASS_SHEET = "有理數班級狀態";
 const RATIONAL_BOSS_HP = 50000;
 const RATIONAL_CLASSES = ["SG1A", "SG1B"];
+const RATIONAL_MULDIV_PLAYER_SHEET = "有理數乘除學生進度";
+const RATIONAL_MULDIV_ANSWER_SHEET = "有理數乘除作答紀錄";
+const RATIONAL_MULDIV_CLASS_SHEET = "有理數乘除班級狀態";
 
 function doGet(e) {
   const action = String(e.parameter.action || "");
@@ -18,6 +21,9 @@ function doGet(e) {
     if (action === "loadRationalPlayer") return jsonResponse(loadRationalPlayer_(e.parameter.className, e.parameter.id));
     if (action === "getRationalDashboardData") return jsonResponse(getCachedRationalDashboardData_(e.parameter.className || ""));
     if (action === "getRationalExportData") return jsonResponse(getRationalExportData_(e.parameter.className || ""));
+    if (action === "loadRationalMulDivPlayer") return jsonResponse(loadRationalMulDivPlayer_(e.parameter.className, e.parameter.id));
+    if (action === "getRationalMulDivDashboardData") return jsonResponse(getCachedRationalMulDivDashboardData_(e.parameter.className || ""));
+    if (action === "getRationalMulDivExportData") return jsonResponse(getRationalMulDivExportData_(e.parameter.className || ""));
     return jsonResponse({ ok: true, service: "divisibility-classroom", version: 1 });
   } catch (error) {
     return jsonResponse({ ok: false, error: error.message });
@@ -30,6 +36,24 @@ function doPost(e) {
   try {
     const payload = JSON.parse(e.parameter.data || "{}");
     const action = String(e.parameter.action || "");
+    if (action === "resetRationalMulDiv") {
+      const className = String(payload.className || "");
+      if (className && !RATIONAL_CLASSES.includes(className)) throw new Error("Invalid class");
+      resetRationalData_(ensureRationalMulDivSheets_(spreadsheet_()), className);
+      clearRationalMulDivDashboardCache_(className);
+      return jsonResponse({ ok: true });
+    }
+    if (action === "saveRationalMulDiv") {
+      validateRationalPayload_(payload);
+      const spreadsheet = spreadsheet_();
+      const sheets = ensureRationalMulDivSheets_(spreadsheet);
+      saveRationalMulDivPlayer_(sheets.player, payload);
+      appendRationalMulDivAnswers_(sheets.answer, payload);
+      updateRationalBoss_(sheets.classState, payload.className, Number(payload.addedDamage) || 0);
+      SpreadsheetApp.flush();
+      clearRationalMulDivDashboardCache_(payload.className);
+      return jsonResponse({ ok: true });
+    }
     if (action === "resetRational") {
       const className = String(payload.className || "");
       if (className && !RATIONAL_CLASSES.includes(className)) throw new Error("Invalid class");
@@ -245,6 +269,123 @@ function clearRationalDashboardCache_(className) {
 
 function rationalDashboardCacheKey_(className) {
   return `rational-dashboard:${encodeURIComponent(className || "all")}`;
+}
+
+function ensureRationalMulDivSheets_(spreadsheet) {
+  let player = spreadsheet.getSheetByName(RATIONAL_MULDIV_PLAYER_SHEET);
+  let answer = spreadsheet.getSheetByName(RATIONAL_MULDIV_ANSWER_SHEET);
+  let classState = spreadsheet.getSheetByName(RATIONAL_MULDIV_CLASS_SHEET);
+  if (!player) {
+    player = spreadsheet.insertSheet(RATIONAL_MULDIV_PLAYER_SHEET);
+    player.appendRow(["班別", "學號", "姓名", "程度", "經驗", "作答數", "答對數", "連勝", "連錯", "最後上線"]);
+    player.setFrozenRows(1);
+  }
+  if (!answer) {
+    answer = spreadsheet.insertSheet(RATIONAL_MULDIV_ANSWER_SHEET);
+    answer.appendRow(["時間", "班別", "學號", "姓名", "程度", "題目", "學生答案", "正確答案", "是否正確"]);
+    answer.setFrozenRows(1);
+  }
+  if (!classState) {
+    classState = spreadsheet.insertSheet(RATIONAL_MULDIV_CLASS_SHEET);
+    classState.appendRow(["班別", "首領能量", "能量上限", "最後更新"]);
+    RATIONAL_CLASSES.forEach((className) => classState.appendRow([className, RATIONAL_BOSS_HP, RATIONAL_BOSS_HP, new Date()]));
+    classState.setFrozenRows(1);
+  }
+  return { player, answer, classState };
+}
+
+function loadRationalMulDivPlayer_(className, studentId) {
+  const sheets = ensureRationalMulDivSheets_(spreadsheet_());
+  const id = Number(studentId);
+  const row = dataRows_(sheets.player, 10).find((item) => item[0] === className && Number(item[1]) === id);
+  const answerRows = dataRows_(sheets.answer, 9).filter((item) => item[1] === className && Number(item[2]) === id);
+  const classRow = dataRows_(sheets.classState, 4).find((item) => item[0] === className);
+  const classState = rationalStateValues_(classRow);
+  return {
+    player: row ? rationalPlayerFromRow_(row) : null,
+    levelStats: rationalLevelStats_(answerRows),
+    bossHp: classState.bossHp,
+    bossMaxHp: classState.bossMaxHp,
+  };
+}
+
+function getRationalMulDivDashboardData_(className) {
+  const sheets = ensureRationalMulDivSheets_(spreadsheet_());
+  const players = dataRows_(sheets.player, 10)
+    .filter((row) => !className || row[0] === className)
+    .map(rationalPlayerFromRow_);
+  const states = dataRows_(sheets.classState, 4)
+    .filter((row) => !className || row[0] === className)
+    .map(rationalStateValues_);
+  const answerRows = dataRows_(sheets.answer, 9).filter((row) => !className || row[1] === className);
+  return {
+    players,
+    levelStats: rationalLevelStats_(answerRows),
+    bossHp: states.reduce((sum, state) => sum + state.bossHp, 0),
+    bossMaxHp: states.reduce((sum, state) => sum + state.bossMaxHp, 0) || RATIONAL_BOSS_HP,
+  };
+}
+
+function getCachedRationalMulDivDashboardData_(className) {
+  const cache = CacheService.getScriptCache();
+  const key = rationalMulDivDashboardCacheKey_(className);
+  const cached = cache.get(key);
+  if (cached) return JSON.parse(cached);
+  const data = getRationalMulDivDashboardData_(className);
+  cache.put(key, JSON.stringify(data), DASHBOARD_CACHE_SECONDS);
+  return data;
+}
+
+function getRationalMulDivExportData_(className) {
+  if (className && !RATIONAL_CLASSES.includes(className)) throw new Error("Invalid class");
+  const sheets = ensureRationalMulDivSheets_(spreadsheet_());
+  const players = dataRows_(sheets.player, 10)
+    .filter((row) => !className || row[0] === className)
+    .map(rationalPlayerFromRow_);
+  const answers = dataRows_(sheets.answer, 9)
+    .filter((row) => !className || row[1] === className)
+    .map((row) => ({
+      timestamp: row[0] instanceof Date ? row[0].toISOString() : String(row[0] || ""),
+      className: row[1], id: Number(row[2]), name: row[3], level: Number(row[4]) || 1,
+      question: row[5], studentAnswer: row[6], correctAnswer: row[7], isCorrect: row[8] === "是",
+    }));
+  return { players, answers };
+}
+
+function clearRationalMulDivDashboardCache_(className) {
+  const keys = [rationalMulDivDashboardCacheKey_(""), rationalMulDivDashboardCacheKey_(className)];
+  if (!className) RATIONAL_CLASSES.forEach((item) => keys.push(rationalMulDivDashboardCacheKey_(item)));
+  CacheService.getScriptCache().removeAll(keys);
+}
+
+function rationalMulDivDashboardCacheKey_(className) {
+  return `rational-muldiv-dashboard:${encodeURIComponent(className || "all")}`;
+}
+
+function saveRationalMulDivPlayer_(sheet, payload) {
+  const rows = dataRows_(sheet, 10);
+  const rowIndex = rows.findIndex((row) => row[0] === payload.className && Number(row[1]) === Number(payload.id));
+  const level = clamp_(Number(payload.level) || 1, 1, 4);
+  const maxXp = level === 1 ? 1500 : 500;
+  const values = [[
+    safeText_(payload.className, 12), Number(payload.id), safeText_(payload.name, 30),
+    level, clamp_(Number(payload.xp) || 0, 0, maxXp),
+    clamp_(Number(payload.total) || 0, 0, 1000000), clamp_(Number(payload.correct) || 0, 0, 1000000),
+    clamp_(Number(payload.streak) || 0, 0, 100000), clamp_(Number(payload.mistakes) || 0, 0, 1000), new Date(),
+  ]];
+  if (rowIndex >= 0) sheet.getRange(rowIndex + 2, 1, 1, 10).setValues(values);
+  else sheet.getRange(sheet.getLastRow() + 1, 1, 1, 10).setValues(values);
+}
+
+function appendRationalMulDivAnswers_(sheet, payload) {
+  const answers = Array.isArray(payload.answers) ? payload.answers.slice(0, 10) : [];
+  if (!answers.length) return;
+  const rows = answers.map((answer) => [
+    new Date(), safeText_(payload.className, 12), Number(payload.id), safeText_(payload.name, 30),
+    clamp_(Number(answer.level) || 1, 1, 4), safeText_(answer.question, 240),
+    safeText_(answer.studentAnswer, 80), safeText_(answer.correctAnswer, 80), answer.isCorrect ? "是" : "否",
+  ]);
+  sheet.getRange(sheet.getLastRow() + 1, 1, rows.length, 9).setValues(rows);
 }
 
 function saveRationalPlayer_(sheet, payload) {
