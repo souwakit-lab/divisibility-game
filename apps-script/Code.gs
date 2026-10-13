@@ -57,7 +57,7 @@ function doPost(e) {
       validateRationalPayload_(payload);
       const spreadsheet = spreadsheet_();
       const sheets = ensureRationalMixedSheets_(spreadsheet);
-      saveRationalMulDivPlayer_(sheets.player, payload);
+      saveRationalMixedPlayer_(sheets.player, payload);
       appendRationalMulDivAnswers_(sheets.answer, payload);
       updateRationalMixedBoss_(sheets.classState, payload.className, Number(payload.addedDamage) || 0);
       SpreadsheetApp.flush();
@@ -578,6 +578,21 @@ function clearRationalMixedDashboardCache_(className) {
 
 function rationalMixedDashboardCacheKey_(className) {
   return `rational-mixed-dashboard:${encodeURIComponent(className || "all")}`;
+}
+
+function saveRationalMixedPlayer_(sheet, payload) {
+  const rows = dataRows_(sheet, 10);
+  const rowIndex = rows.findIndex((row) => row[0] === payload.className && Number(row[1]) === Number(payload.id));
+  const level = clamp_(Number(payload.level) || 1, 1, 4);
+  const maxXp = level === 1 ? 800 : 500;
+  const values = [[
+    safeText_(payload.className, 12), Number(payload.id), safeText_(payload.name, 30),
+    level, clamp_(Number(payload.xp) || 0, 0, maxXp),
+    clamp_(Number(payload.total) || 0, 0, 1000000), clamp_(Number(payload.correct) || 0, 0, 1000000),
+    clamp_(Number(payload.streak) || 0, 0, 100000), clamp_(Number(payload.mistakes) || 0, 0, 1000), new Date(),
+  ]];
+  if (rowIndex >= 0) sheet.getRange(rowIndex + 2, 1, 1, 10).setValues(values);
+  else sheet.getRange(sheet.getLastRow() + 1, 1, 1, 10).setValues(values);
 }
 
 function saveRationalMulDivPlayer_(sheet, payload) {
