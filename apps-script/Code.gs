@@ -13,6 +13,10 @@ const RATIONAL_MULDIV_PLAYER_SHEET = "有理數乘除學生進度";
 const RATIONAL_MULDIV_ANSWER_SHEET = "有理數乘除作答紀錄";
 const RATIONAL_MULDIV_CLASS_SHEET = "有理數乘除班級狀態";
 const RATIONAL_MULDIV_BOSS_HP = 300000;
+const RATIONAL_MIXED_PLAYER_SHEET = "有理數混合運算學生進度";
+const RATIONAL_MIXED_ANSWER_SHEET = "有理數混合運算作答紀錄";
+const RATIONAL_MIXED_CLASS_SHEET = "有理數混合運算班級狀態";
+const RATIONAL_MIXED_BOSS_HP = 300000;
 
 function doGet(e) {
   const action = String(e.parameter.action || "");
@@ -26,6 +30,10 @@ function doGet(e) {
     if (action === "getRationalMulDivDashboardData") return jsonResponse(getCachedRationalMulDivDashboardData_(e.parameter.className || ""));
     if (action === "getRationalMulDivExportData") return jsonResponse(getRationalMulDivExportData_(e.parameter.className || ""));
     if (action === "getRationalMulDivStudentExportData") return jsonResponse(getRationalMulDivStudentExportData_(e.parameter.className, e.parameter.id));
+    if (action === "loadRationalMixedPlayer") return jsonResponse(loadRationalMixedPlayer_(e.parameter.className, e.parameter.id));
+    if (action === "getRationalMixedDashboardData") return jsonResponse(getCachedRationalMixedDashboardData_(e.parameter.className || ""));
+    if (action === "getRationalMixedExportData") return jsonResponse(getRationalMixedExportData_(e.parameter.className || ""));
+    if (action === "getRationalMixedStudentExportData") return jsonResponse(getRationalMixedStudentExportData_(e.parameter.className, e.parameter.id));
     return jsonResponse({ ok: true, service: "divisibility-classroom", version: 1 });
   } catch (error) {
     return jsonResponse({ ok: false, error: error.message });
@@ -38,6 +46,24 @@ function doPost(e) {
   try {
     const payload = JSON.parse(e.parameter.data || "{}");
     const action = String(e.parameter.action || "");
+    if (action === "resetRationalMixed") {
+      const className = String(payload.className || "");
+      if (className && !RATIONAL_CLASSES.includes(className)) throw new Error("Invalid class");
+      resetRationalMixedData_(ensureRationalMixedSheets_(spreadsheet_()), className);
+      clearRationalMixedDashboardCache_(className);
+      return jsonResponse({ ok: true });
+    }
+    if (action === "saveRationalMixed") {
+      validateRationalPayload_(payload);
+      const spreadsheet = spreadsheet_();
+      const sheets = ensureRationalMixedSheets_(spreadsheet);
+      saveRationalMulDivPlayer_(sheets.player, payload);
+      appendRationalMulDivAnswers_(sheets.answer, payload);
+      updateRationalMixedBoss_(sheets.classState, payload.className, Number(payload.addedDamage) || 0);
+      SpreadsheetApp.flush();
+      clearRationalMixedDashboardCache_(payload.className);
+      return jsonResponse({ ok: true });
+    }
     if (action === "resetRationalMulDiv") {
       const className = String(payload.className || "");
       if (className && !RATIONAL_CLASSES.includes(className)) throw new Error("Invalid class");
@@ -413,6 +439,145 @@ function clearRationalMulDivDashboardCache_(className) {
 
 function rationalMulDivDashboardCacheKey_(className) {
   return `rational-muldiv-dashboard:${encodeURIComponent(className || "all")}`;
+}
+
+function ensureRationalMixedSheets_(spreadsheet) {
+  let player = spreadsheet.getSheetByName(RATIONAL_MIXED_PLAYER_SHEET);
+  let answer = spreadsheet.getSheetByName(RATIONAL_MIXED_ANSWER_SHEET);
+  let classState = spreadsheet.getSheetByName(RATIONAL_MIXED_CLASS_SHEET);
+  if (!player) {
+    player = spreadsheet.insertSheet(RATIONAL_MIXED_PLAYER_SHEET);
+    player.appendRow(["班別", "學號", "姓名", "程度", "經驗", "作答數", "答對數", "連勝", "連錯", "最後上線"]);
+    player.setFrozenRows(1);
+  }
+  if (!answer) {
+    answer = spreadsheet.insertSheet(RATIONAL_MIXED_ANSWER_SHEET);
+    answer.appendRow(["時間", "班別", "學號", "姓名", "程度", "題目", "學生答案", "正確答案", "是否正確"]);
+    answer.setFrozenRows(1);
+  }
+  if (!classState) {
+    classState = spreadsheet.insertSheet(RATIONAL_MIXED_CLASS_SHEET);
+    classState.appendRow(["班別", "首領能量", "能量上限", "最後更新"]);
+    RATIONAL_CLASSES.forEach((className) => classState.appendRow([className, RATIONAL_MIXED_BOSS_HP, RATIONAL_MIXED_BOSS_HP, new Date()]));
+    classState.setFrozenRows(1);
+  }
+  return { player, answer, classState };
+}
+
+function loadRationalMixedPlayer_(className, studentId) {
+  const sheets = ensureRationalMixedSheets_(spreadsheet_());
+  const id = Number(studentId);
+  const row = dataRows_(sheets.player, 10).find((item) => item[0] === className && Number(item[1]) === id);
+  const answerRows = dataRows_(sheets.answer, 9).filter((item) => item[1] === className && Number(item[2]) === id);
+  const classRow = dataRows_(sheets.classState, 4).find((item) => item[0] === className);
+  const classState = rationalMixedStateValues_(classRow);
+  return {
+    player: row ? rationalPlayerFromRow_(row) : null,
+    levelStats: rationalLevelStats_(answerRows),
+    bossHp: classState.bossHp,
+    bossMaxHp: classState.bossMaxHp,
+  };
+}
+
+function getRationalMixedDashboardData_(className) {
+  const sheets = ensureRationalMixedSheets_(spreadsheet_());
+  const players = dataRows_(sheets.player, 10)
+    .filter((row) => !className || row[0] === className)
+    .map(rationalPlayerFromRow_);
+  const states = dataRows_(sheets.classState, 4)
+    .filter((row) => !className || row[0] === className)
+    .map(rationalMixedStateValues_);
+  const answerRows = dataRows_(sheets.answer, 9).filter((row) => !className || row[1] === className);
+  return {
+    players,
+    levelStats: rationalLevelStats_(answerRows),
+    bossHp: states.reduce((sum, state) => sum + state.bossHp, 0),
+    bossMaxHp: states.reduce((sum, state) => sum + state.bossMaxHp, 0) || RATIONAL_MIXED_BOSS_HP,
+  };
+}
+
+function getCachedRationalMixedDashboardData_(className) {
+  const cache = CacheService.getScriptCache();
+  const key = rationalMixedDashboardCacheKey_(className);
+  const cached = cache.get(key);
+  if (cached) return JSON.parse(cached);
+  const data = getRationalMixedDashboardData_(className);
+  cache.put(key, JSON.stringify(data), DASHBOARD_CACHE_SECONDS);
+  return data;
+}
+
+function getRationalMixedExportData_(className) {
+  if (className && !RATIONAL_CLASSES.includes(className)) throw new Error("Invalid class");
+  const sheets = ensureRationalMixedSheets_(spreadsheet_());
+  const players = dataRows_(sheets.player, 10)
+    .filter((row) => !className || row[0] === className)
+    .map(rationalPlayerFromRow_);
+  const answers = dataRows_(sheets.answer, 9)
+    .filter((row) => !className || row[1] === className)
+    .map((row) => ({
+      timestamp: row[0] instanceof Date ? row[0].toISOString() : String(row[0] || ""),
+      className: row[1], id: Number(row[2]), name: row[3], level: Number(row[4]) || 1,
+      question: row[5], studentAnswer: row[6], correctAnswer: row[7], isCorrect: row[8] === "是",
+    }));
+  return { players, answers };
+}
+
+function getRationalMixedStudentExportData_(className, studentId) {
+  if (!RATIONAL_CLASSES.includes(className)) throw new Error("Invalid class");
+  const id = Number(studentId);
+  if (!Number.isInteger(id) || id < 1 || id > 34 || (className === "SG1B" && id === 29)) throw new Error("Invalid student id");
+  const sheets = ensureRationalMixedSheets_(spreadsheet_());
+  const row = dataRows_(sheets.player, 10).find((item) => item[0] === className && Number(item[1]) === id);
+  const answerRows = dataRows_(sheets.answer, 9).filter((item) => item[1] === className && Number(item[2]) === id);
+  const wrongAnswers = answerRows.filter((item) => item[8] !== "是").map((item) => ({
+    timestamp: item[0] instanceof Date ? item[0].toISOString() : String(item[0] || ""),
+    level: Number(item[4]) || 1,
+    question: item[5], studentAnswer: item[6], correctAnswer: item[7],
+  }));
+  return {
+    player: row ? rationalPlayerFromRow_(row) : null,
+    levelStats: rationalLevelStats_(answerRows),
+    wrongAnswers,
+  };
+}
+
+function resetRationalMixedData_(sheets, className) {
+  rewriteRationalRows_(sheets.player, 10, (row) => className && row[0] !== className);
+  rewriteRationalRows_(sheets.answer, 9, (row) => className && row[1] !== className);
+  const states = dataRows_(sheets.classState, 4);
+  states.forEach((row, index) => {
+    if (!className || row[0] === className) {
+      sheets.classState.getRange(index + 2, 2, 1, 3).setValues([[RATIONAL_MIXED_BOSS_HP, RATIONAL_MIXED_BOSS_HP, new Date()]]);
+    }
+  });
+  SpreadsheetApp.flush();
+}
+
+function updateRationalMixedBoss_(sheet, className, damage) {
+  const rows = dataRows_(sheet, 4);
+  const index = rows.findIndex((row) => row[0] === className);
+  if (index < 0) return;
+  const state = rationalMixedStateValues_(rows[index]);
+  sheet.getRange(index + 2, 2, 1, 3).setValues([[Math.max(0, state.bossHp - clamp_(damage, 0, 100)), state.bossMaxHp, new Date()]]);
+}
+
+function rationalMixedStateValues_(row) {
+  if (!row) return { bossHp: RATIONAL_MIXED_BOSS_HP, bossMaxHp: RATIONAL_MIXED_BOSS_HP };
+  const previousMax = Math.max(1, Number(row[2]) || RATIONAL_MIXED_BOSS_HP);
+  const rawHp = Number(row[1]);
+  const previousHp = Math.max(0, Math.min(previousMax, Number.isFinite(rawHp) ? rawHp : previousMax));
+  const damageDealt = previousMax - previousHp;
+  return { bossHp: Math.max(0, RATIONAL_MIXED_BOSS_HP - damageDealt), bossMaxHp: RATIONAL_MIXED_BOSS_HP };
+}
+
+function clearRationalMixedDashboardCache_(className) {
+  const keys = [rationalMixedDashboardCacheKey_(""), rationalMixedDashboardCacheKey_(className)];
+  if (!className) RATIONAL_CLASSES.forEach((item) => keys.push(rationalMixedDashboardCacheKey_(item)));
+  CacheService.getScriptCache().removeAll(keys);
+}
+
+function rationalMixedDashboardCacheKey_(className) {
+  return `rational-mixed-dashboard:${encodeURIComponent(className || "all")}`;
 }
 
 function saveRationalMulDivPlayer_(sheet, payload) {
