@@ -32,12 +32,15 @@ function buildData(players, attempts) {
 }
 function render(data) {
   $("stat-players").textContent = data.players.length; $("stat-gems").textContent = data.players.reduce((sum, player) => sum + player.unlocked.length, 0); $("updated-at").textContent = new Date().toLocaleTimeString("zh-Hant", {hour:"2-digit", minute:"2-digit", second:"2-digit"});
-  $("gem-grid").innerHTML = data.gems.map((g, i) => `<button class="gem-card" style="--gem:${g.color}" data-gem="${i}" aria-label="「${g.char}」${g.correct.length}人答對"><span class="gem-text">「${g.char}」 ${g.correct.length}人答對</span></button>`).join("");
+  $("gem-grid").innerHTML = data.gems.map((g, i) => `<button class="gem-card" style="--gem:${GEMS[i].color}" data-gem="${i}" aria-label="「${GEMS[i].char}」${g.correct.length}人答對">${teacherGemSvg(GEMS[i], i)}<span class="gem-answer-count">${g.correct.length}人答對</span></button>`).join("");
   const ranking = [...data.players].sort((a, b) => b.unlocked.length - a.unlocked.length || String(a.lastCompletedAt || "9999").localeCompare(String(b.lastCompletedAt || "9999")) || String(a.name).localeCompare(String(b.name)));
   $("leaderboard").innerHTML = ranking.length ? ranking.map((p, i) => `<div class="leader-row"><span class="rank">${i + 1}</span><span class="name">${escapeHtml(p.name)}<small>${escapeHtml(p.className)} ${p.id}號</small></span><span class="score">${p.unlocked.length} 顆</span></div>`).join("") : '<div class="person">尚未有學生登入</div>';
   document.querySelectorAll("[data-gem]").forEach((button) => button.addEventListener("click", () => openModal(data.gems[Number(button.dataset.gem)])));
 }
-function openModal(gem) { $("modal-content").innerHTML = `<h2>💎 「${gem.char}」${gem.name}</h2><p>答對後會自動離開答錯名單。</p>${roster("已答對名單", gem.correct, "correct")}${roster("答錯名單", gem.wrong, "wrong")}${roster("未答對名單", gem.pending, "pending")}`; $("modal-backdrop").hidden = false; }
+function teacherGemSvg(gem, index) {
+  return `<svg class="teacher-gem-art" viewBox="0 0 120 135" aria-hidden="true"><defs><linearGradient id="teacher-gem-${index}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".27" stop-color="${gem.color}"/><stop offset="1" stop-color="#30294a"/></linearGradient></defs><path d="M60 4 L102 35 L92 90 L60 127 L28 90 L18 35 Z" fill="url(#teacher-gem-${index})" stroke="#ffe5ad" stroke-width="3"/><path d="M18 35 L60 52 L102 35 M60 52 L60 127 M60 4 L60 52 M28 90 L60 52 L92 90" stroke="#fff" stroke-opacity=".47" stroke-width="2" fill="none"/><text class="teacher-gem-char" x="60" y="84" text-anchor="middle">${gem.char}</text></svg>`;
+}
+function openModal(gem) { $("modal-content").innerHTML = `<h2>💎 「${gem.char}」</h2>${roster("已答對名單", gem.correct, "correct")}${roster("答錯名單", gem.wrong, "wrong")}${roster("未答對名單", gem.pending, "pending")}`; $("modal-backdrop").hidden = false; }
 function roster(title, list, cls) { return `<div class="roster-section"><h3 class="${cls}">${title}（${list.length}）</h3><div class="roster-list">${list.length ? list.map((p) => `<div class="person">${escapeHtml(p.name)}<small>${escapeHtml(p.className)} ${p.id}號</small></div>`).join("") : '<div class="person">暫無學生</div>'}</div></div>`; }
 function closeModal() { $("modal-backdrop").hidden = true; }
 async function resetData() {
