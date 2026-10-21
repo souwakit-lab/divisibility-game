@@ -32,7 +32,7 @@ function buildData(players, attempts) {
 }
 function render(data) {
   $("stat-players").textContent = data.players.length; $("stat-gems").textContent = data.players.reduce((sum, player) => sum + player.unlocked.length, 0); $("updated-at").textContent = new Date().toLocaleTimeString("zh-Hant", {hour:"2-digit", minute:"2-digit", second:"2-digit"});
-  $("gem-grid").innerHTML = data.gems.map((g, i) => `<button class="gem-card" style="--gem:${g.color}" data-gem="${i}" aria-label="查看「${g.char}」名單"><span class="gem-label">「${g.char}」</span><span class="count">${g.correct.length}人答對</span></button>`).join("");
+  $("gem-grid").innerHTML = data.gems.map((g, i) => `<button class="gem-card" style="--gem:${g.color}" data-gem="${i}" aria-label="「${g.char}」${g.correct.length}人答對"><span class="gem-text">「${g.char}」 ${g.correct.length}人答對</span></button>`).join("");
   const ranking = [...data.players].sort((a, b) => b.unlocked.length - a.unlocked.length || String(a.lastCompletedAt || "9999").localeCompare(String(b.lastCompletedAt || "9999")) || String(a.name).localeCompare(String(b.name)));
   $("leaderboard").innerHTML = ranking.length ? ranking.map((p, i) => `<div class="leader-row"><span class="rank">${i + 1}</span><span class="name">${escapeHtml(p.name)}<small>${escapeHtml(p.className)} ${p.id}號</small></span><span class="score">${p.unlocked.length} 顆</span></div>`).join("") : '<div class="person">尚未有學生登入</div>';
   document.querySelectorAll("[data-gem]").forEach((button) => button.addEventListener("click", () => openModal(data.gems[Number(button.dataset.gem)])));
