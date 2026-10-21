@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>數列探險：開寶箱</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="treasure.css">
+  <script defer src="treasure.js"></script>
+</head>
+<body>
+  <main class="game-shell">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">✦</span><span>數列探險</span></div>
+      <div class="mission">任務：找出寶箱密碼，開啟 4 個寶箱</div>
+      <button class="text-button" id="reset-game" type="button">重新開始</button>
+    </header>
+
+    <section class="intro-card" aria-labelledby="game-title">
+      <div>
+        <p class="eyebrow">第一關・規律森林</p>
+        <h1 id="game-title">沿著小路，找出數列的下一項</h1>
+        <p>用方向鍵、WASD 或點擊地圖移動人物。走近寶箱後點擊它，猜測數列的下一項，並說明規律。</p>
+      </div>
+      <div class="progress-box" aria-live="polite">
+        <span>已開啟</span>
+        <strong><span id="opened-count">0</span> / 4</strong>
+      </div>
+    </section>
+
+    <section class="play-area">
+      <div class="map-panel">
+        <div class="map-help">點擊空白處移動　•　走近寶箱再點擊</div>
+        <div id="map" class="map" tabindex="0" aria-label="規律森林地圖，可用方向鍵或 WASD 移動人物">
+          <div class="sun-glow"></div>
+          <div class="cloud cloud-one"></div><div class="cloud cloud-two"></div>
+          <div class="tree tree-one">♣</div><div class="tree tree-two">♣</div><div class="tree tree-three">♣</div>
+          <div class="tree tree-four">♣</div><div class="tree tree-five">♣</div><div class="tree tree-six">♣</div>
+          <div class="path path-a"></div><div class="path path-b"></div><div class="path path-c"></div>
+          <div id="move-marker" class="move-marker" aria-hidden="true"></div>
+
+          <button class="chest chest-1" data-chest="c1" type="button" aria-label="第一個寶箱">
+            <span class="chest-icon">🎁</span><span class="chest-label">寶箱 1</span>
+          </button>
+          <button class="chest chest-2" data-chest="c2" type="button" aria-label="第二個寶箱">
+            <span class="chest-icon">🎁</span><span class="chest-label">寶箱 2</span>
+          </button>
+          <button class="chest chest-3" data-chest="c3" type="button" aria-label="第三個寶箱">
+            <span class="chest-icon">🎁</span><span class="chest-label">寶箱 3</span>
+          </button>
+          <button class="chest chest-4" data-chest="c4" type="button" aria-label="第四個寶箱">
+            <span class="chest-icon">🎁</span><span class="chest-label">終點寶箱</span>
+          </button>
+
+          <div id="player" class="player" aria-label="探險人物"><span class="player-face">🧑‍🚀</span><span class="player-shadow"></span></div>
+        </div>
+      </div>
+
+      <aside class="side-panel" aria-label="探險紀錄">
+        <section class="guide-card">
+          <p class="card-kicker">課堂小提示</p>
+          <h2>先看相鄰兩項怎樣改變</h2>
+          <p>例如：由第一項到第二項，是加、減、乘，還是除以同一個數？</p>
+        </section>
+        <section class="record-card">
+          <div class="record-heading"><h2>已找到的規律</h2><span id="record-empty">尚未開啟寶箱</span></div>
+          <ol id="record-list" class="record-list"></ol>
+        </section>
+        <p class="definition">一組按次序排列的數字稱為<strong>數列</strong>，數列中的每個數字稱為一個<strong>項</strong>。</p>
+      </aside>
+    </section>
+  </main>
+
+  <dialog id="chest-dialog" class="chest-dialog" aria-labelledby="dialog-title">
+    <button class="close-dialog" type="button" aria-label="關閉">×</button>
+    <p class="eyebrow" id="dialog-number">寶箱 1</p>
+    <h2 id="dialog-title">寶箱密碼</h2>
+    <p class="question-instruction">猜測以下數列的下一項，並解釋你的答案。</p>
+    <div id="sequence" class="sequence" aria-label="數列"></div>
+    <form id="answer-form">
+      <label class="field-label" for="next-term">下一項是：</label>
+      <input id="next-term" inputmode="numeric" autocomplete="off" required aria-label="下一項">
+      <div class="rule-row">
+        <label class="field-label" for="operation">規律：每次</label>
+        <select id="operation" aria-label="運算">
+          <option value="加">加</option><option value="減">減</option><option value="乘">乘</option><option value="除">除以</option>
+        </select>
+        <input id="rule-number" inputmode="numeric" autocomplete="off" required aria-label="規律的數字">
+      </div>
+      <div class="form-actions">
+        <button id="hint-button" class="hint-button" type="button">提示</button>
+        <button class="submit-button" type="submit">開啟寶箱</button>
+      </div>
+      <p id="hint-text" class="hint-text" aria-live="polite"></p>
+      <p id="answer-feedback" class="answer-feedback" aria-live="polite"></p>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

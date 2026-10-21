@@ -1,4 +1,5 @@
-const API_URL = window.DIVISIBILITY_CONFIG?.apiUrl || "";
+const IS_PREVIEW = new URLSearchParams(location.search).has("preview");
+const API_URL = IS_PREVIEW ? "" : window.DIVISIBILITY_CONFIG?.apiUrl || "";
 const LOCAL_KEY = "divisibility-classroom-v1";
 let syncInFlight = false;
 let syncQueued = false;
@@ -35,6 +36,11 @@ const pick = (items) => items[Math.floor(Math.random() * items.length)];
 
 function init() {
   populateLogin();
+  Battle.init();
+  if (IS_PREVIEW) {
+    $("login-status").textContent = "技能預覽模式：不會儲存或傳送課堂成績。";
+    login();
+  }
   $("class-select").addEventListener("change", updateStudentPreview);
   $("id-select").addEventListener("change", updateStudentPreview);
   $("login-button").addEventListener("click", login);
@@ -89,11 +95,11 @@ async function login() {
   };
 
   try {
-    const saved = API_URL ? await loadRemotePlayer(className, id) : loadLocalPlayer(className, id);
+    const saved = IS_PREVIEW ? null : API_URL ? await loadRemotePlayer(className, id) : loadLocalPlayer(className, id);
     if (saved?.player) Object.assign(state.player, normalizePlayer(saved.player));
     if (Number.isFinite(Number(saved?.bossHp))) state.bossHp = Number(saved.bossHp);
     if (Number.isFinite(Number(saved?.bossMaxHp))) state.bossMaxHp = Number(saved.bossMaxHp);
-    $("player-identity").textContent = `${className} ${id} 號 ${name}`;
+    $("player-identity").textContent = IS_PREVIEW ? "技能預覽 · 不儲存成績" : `${className} ${id} 號 ${name}`;
     $("login-screen").classList.add("is-hidden");
     $("game-screen").classList.remove("is-hidden");
     updateUI();
@@ -150,12 +156,14 @@ function generateQuestion(level) {
 }
 
 function nextQuestion() {
+  Battle.cancel();
   const level = state.player.level;
   state.question = generateQuestion(level);
   state.questionNumber += 1;
   state.questionStartedAt = Date.now();
   state.selections = {};
   state.answerLocked = false;
+  $("next-button").disabled = false;
 
   $("question-count").textContent = state.questionNumber;
   $("question-number").textContent = state.question.number;
@@ -255,12 +263,15 @@ function evaluateAnswer() {
   });
 
   const leveledUp = applyLevelUp();
-  showFeedback(isCorrect);
+  showFeedback(isCorrect, info.damage);
+  if (isCorrect) Battle.cast(question.divisors, state.player.combo, info.damage, question.number);
+  else Battle.enemyBreath();
   updateUI();
   syncNow();
   if (leveledUp) {
+    $("next-button").disabled = true;
     $("level-overlay-title").textContent = `進入${degreeInfo[state.player.level].label}`;
-    setTimeout(() => $("level-overlay").classList.remove("is-hidden"), 650);
+    setTimeout(() => $("level-overlay").classList.remove("is-hidden"), isCorrect ? (state.player.combo % 5 === 0 ? Battle.timings.ultimate + 200 : Battle.timings.normal + 200) : 650);
   }
 }
 
@@ -277,14 +288,14 @@ function formatAnswer(values, divisors) {
   return divisors.map((divisor) => `${divisor}:${values[divisor] ? "能" : "不能"}`).join("｜");
 }
 
-function showFeedback(isCorrect) {
+function showFeedback(isCorrect, damage) {
   const feedback = $("feedback");
   feedback.className = `feedback ${isCorrect ? "correct" : "wrong"}`;
   $("feedback-icon").innerHTML = `<i data-lucide="${isCorrect ? "check" : "x"}"></i>`;
   $("feedback-title").textContent = isCorrect ? "判斷正確" : "再看一次規律";
   $("feedback-copy").textContent = buildExplanation(state.question);
   $("activity-text").textContent = isCorrect
-    ? `命中！為全班削減 ${degreeInfo[state.player.level].damage} 點能量。`
+    ? `命中！為全班削減 ${damage} 點能量。`
     : `答案是：${formatAnswer(state.question.answers, state.question.divisors)}`;
   if (window.lucide) lucide.createIcons();
 }
@@ -310,6 +321,7 @@ function updateUI() {
   $("level-number").textContent = level;
   $("player-rank").textContent = info.rank;
   $("player-avatar").src = info.avatar;
+  $("battle-hero").src = info.avatar;
   $("question-instruction").textContent = level === 3 ? "完成四項整除判斷" : "判斷這個數能否整除";
   $("rule-hint").textContent = info.hint;
   $("hp-copy").textContent = `${state.player.hp} / ${maxHp}`;
@@ -317,11 +329,13 @@ function updateUI() {
   $("exp-copy").textContent = level === 3 ? `${state.player.exp} / ∞` : `${state.player.exp} / ${info.maxExp}`;
   $("exp-bar").style.width = level === 3 ? "100%" : `${Math.min(100, (state.player.exp / info.maxExp) * 100)}%`;
   $("combo-count").textContent = state.player.combo;
+  Battle.updateStatus({combo: state.player.combo, bossHp: state.bossHp, bossMaxHp: state.bossMaxHp});
   $("boss-copy").textContent = `${Math.round(state.bossHp)} / ${state.bossMaxHp}`;
   $("boss-bar").style.width = `${Math.max(0, (state.bossHp / state.bossMaxHp) * 100)}%`;
 }
 
 function syncNow() {
+  if (IS_PREVIEW) { state.pendingAnswers = []; state.pendingDamage = 0; return; }
   syncQueued = true;
   if (!syncInFlight) flushSyncQueue();
 }

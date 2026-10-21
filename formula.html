@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>公式實驗室：代入任務</title>
+  <meta name="description" content="公式和代入法六關分層練習遊戲">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="formula.css">
+  <script defer src="formula.js"></script>
+</head>
+<body>
+  <main class="game-shell">
+    <header class="topbar">
+      <a class="brand" href="./" aria-label="返回數學任務站"><span class="brand-mark">∑</span><span>公式實驗室<small>SUBSTITUTION LAB</small></span></a>
+      <div class="top-actions"><span id="score-copy">本次得分 0</span><button id="reset-button" class="ghost-button" type="button">重新開始</button></div>
+    </header>
+
+    <section class="hero-card">
+      <div>
+        <p class="eyebrow">公式和代入法・六關任務</p>
+        <h1>把數字放進公式，<br><em>讓答案自己出現。</em></h1>
+        <p class="hero-lead">每關先讀懂公式，再完成代入。答對 3 題即可解鎖下一關。</p>
+      </div>
+      <div class="hero-orbit" aria-hidden="true"><span>x</span><span>−3</span><span>²</span><strong>f</strong></div>
+    </section>
+
+    <section class="progress-card" aria-label="六關進度">
+      <div class="progress-head"><div><span class="section-label">任務進度</span><strong id="level-copy">第 1 關・公式偵測</strong></div><span id="unlock-copy">答對 3 題解鎖下一關</span></div>
+      <div id="level-tabs" class="level-tabs"></div>
+    </section>
+
+    <section class="workspace">
+      <div class="question-panel">
+        <div class="question-heading"><div><span id="level-kicker" class="level-kicker">第 1 關</span><h2 id="question-title">公式偵測</h2></div><span id="question-number" class="question-number">第 1 / 5 題</span></div>
+        <p id="question-prompt" class="question-prompt"></p>
+        <div id="question-content" class="question-content"></div>
+        <form id="answer-form">
+          <div id="answer-area"></div>
+          <div class="form-row"><button id="hint-button" class="hint-button" type="button">給我提示</button><button class="submit-button" type="submit">提交答案</button></div>
+          <p id="hint-text" class="hint-text" aria-live="polite"></p>
+          <p id="feedback" class="feedback" aria-live="polite"></p>
+        </form>
+      </div>
+
+      <aside class="guide-panel">
+        <div class="guide-card"><span class="section-label">小筆記</span><h2 id="guide-title">公式是甚麼？</h2><p id="guide-text">表示兩個或以上變數之間關係的等式，稱為公式。</p></div>
+        <div class="stats-card"><div><span>本關答對</span><strong id="level-score">0 / 5</strong></div><div><span>連續答對</span><strong id="streak-copy">0</strong></div><div><span>已解鎖</span><strong id="unlocked-copy">1 / 6</strong></div></div>
+        <div class="rule-card"><span class="section-label">代入三步</span><ol><li>找出公式中的字母</li><li>把已知數值代入括號</li><li>按照運算次序計算</li></ol></div>
+      </aside>
+    </section>
+  </main>
+
+  <dialog id="complete-dialog" class="complete-dialog">
+    <div class="complete-icon">✓</div><p class="eyebrow">任務完成</p><h2 id="complete-title">下一關已解鎖！</h2><p id="complete-text"></p><button id="continue-button" class="submit-button" type="button">繼續挑戰</button>
+  </dialog>
+</body>
+</html>

@@ -21,10 +21,28 @@ const GENERAL_TERM_PLAYER_SHEET = "通項公式學生進度";
 const GENERAL_TERM_ANSWER_SHEET = "通項公式作答紀錄";
 const GENERAL_TERM_CLASS_SHEET = "通項公式班級狀態";
 const GENERAL_TERM_BOSS_HP = 300000;
+const SIMPLIFY_PLAYER_SHEET = "化簡代數式學生進度";
+const SIMPLIFY_ANSWER_SHEET = "化簡代數式作答紀錄";
+const SIMPLIFY_CLASS_SHEET = "化簡代數式班級狀態";
+const SIMPLIFY_BOSS_HP = 300000;
+const NTH_TERM_PLAYER_SHEET = "通項公式訓練學生進度";
+const NTH_TERM_ANSWER_SHEET = "通項公式訓練作答紀錄";
+const NTH_TERM_CLASS_SHEET = "通項公式訓練班級狀態";
+const NTH_TERM_BOSS_HP = 300000;
+const GEM_PLAYER_SHEET = "七寶石學生進度";
+const GEM_ANSWER_SHEET = "七寶石作答紀錄";
+const GEM_CLASSES = ["高一甲", "高一乙", "高一丙", "高一丁"];
 
 function doGet(e) {
   const action = String(e.parameter.action || "");
   try {
+    if (action === "loadNthTermPlayer") return jsonResponse(loadNthTermPlayer_(e.parameter.className, e.parameter.id));
+    if (action === "getNthTermDashboardData") return jsonResponse(getCachedNthTermDashboardData_(e.parameter.className || ""));
+    if (action === "getNthTermExportData") return jsonResponse(getNthTermExportData_(e.parameter.className || ""));
+    if (action === "getNthTermStudentExportData") return jsonResponse(getNthTermStudentExportData_(e.parameter.className, e.parameter.id));
+    if (action === "getNthTermSyncStatus") return jsonResponse({ ok:true, received:JSON.parse(PropertiesService.getScriptProperties().getProperty(nthTermReceiptKey_(e.parameter.className, e.parameter.id)) || "[]").includes(String(e.parameter.batchId || "")) });
+    if (action === "loadGemPlayer") return jsonResponse(loadGemPlayer_(e.parameter.className, e.parameter.id, e.parameter.name));
+    if (action === "getGemDashboardData") return jsonResponse(getGemDashboardData_(e.parameter.className || ""));
     if (action === "loadPlayer") return jsonResponse(loadPlayer_(e.parameter.className, e.parameter.id));
     if (action === "getDashboardData") return jsonResponse(getCachedDashboardData_(e.parameter.className || ""));
     if (action === "loadRationalPlayer") return jsonResponse(loadRationalPlayer_(e.parameter.className, e.parameter.id));
@@ -42,6 +60,14 @@ function doGet(e) {
     if (action === "getGeneralTermDashboardData") return jsonResponse(getCachedGeneralTermDashboardData_(e.parameter.className || ""));
     if (action === "getGeneralTermExportData") return jsonResponse(getGeneralTermExportData_(e.parameter.className || ""));
     if (action === "getGeneralTermStudentExportData") return jsonResponse(getGeneralTermStudentExportData_(e.parameter.className, e.parameter.id));
+    if (action === "loadSimplifyPlayer") return jsonResponse(loadSimplifyPlayer_(e.parameter.className, e.parameter.id));
+    if (action === "getSimplifyDashboardData") return jsonResponse(getCachedSimplifyDashboardData_(e.parameter.className || ""));
+    if (action === "getSimplifyExportData") return jsonResponse(getSimplifyExportData_(e.parameter.className || ""));
+    if (action === "getSimplifyStudentExportData") return jsonResponse(getSimplifyStudentExportData_(e.parameter.className, e.parameter.id));
+    if (action === "getSimplifySyncStatus") {
+      const key = simplifyReceiptKey_(e.parameter.className, e.parameter.id);
+      return jsonResponse({ ok:true, received:JSON.parse(PropertiesService.getScriptProperties().getProperty(key) || "[]").includes(String(e.parameter.batchId || "")) });
+    }
     return jsonResponse({ ok: true, service: "divisibility-classroom", version: 1 });
   } catch (error) {
     return jsonResponse({ ok: false, error: error.message });
@@ -54,11 +80,37 @@ function doPost(e) {
   try {
     const payload = JSON.parse(e.parameter.data || "{}");
     const action = String(e.parameter.action || "");
+    if (action === "resetNthTerm") {
+      const className = String(payload.className || "");
+      if (className && !RATIONAL_CLASSES.includes(className)) throw new Error("Invalid class");
+      resetNthTermData_(ensureNthTermSheets_(spreadsheet_()), className); clearNthTermDashboardCache_(className);
+      return jsonResponse({ ok:true });
+    }
+    if (action === "saveNthTerm") {
+      validateRationalPayload_(payload);
+      const receipts = PropertiesService.getScriptProperties(), key = nthTermReceiptKey_(payload.className, payload.id);
+      const received = JSON.parse(receipts.getProperty(key) || "[]");
+      if (payload.batchId && received.includes(payload.batchId)) return jsonResponse({ ok:true, duplicate:true });
+      const sheets = ensureNthTermSheets_(spreadsheet_());
+      saveNthTermPlayer_(sheets.player,payload); appendNthTermAnswers_(sheets.answer,payload);
+      const correctAnswers = (Array.isArray(payload.answers) ? payload.answers.slice(0,10) : []).filter((answer) => answer.isCorrect).length;
+      updateNthTermBoss_(sheets.classState,payload.className,correctAnswers * 45);
+      SpreadsheetApp.flush(); clearNthTermDashboardCache_(payload.className);
+      if (payload.batchId) receipts.setProperty(key,JSON.stringify([...received,payload.batchId].slice(-100)));
+      return jsonResponse({ ok:true });
+    }
     if (action === "resetGeneralTerm") {
       const className = String(payload.className || "");
       if (className && !RATIONAL_CLASSES.includes(className)) throw new Error("Invalid class");
       resetGeneralTermData_(ensureGeneralTermSheets_(spreadsheet_()), className);
       clearGeneralTermDashboardCache_(className);
+      return jsonResponse({ ok: true });
+    }
+    if (action === "resetSimplify") {
+      const className = String(payload.className || "");
+      if (className && !RATIONAL_CLASSES.includes(className)) throw new Error("Invalid class");
+      resetSimplifyData_(ensureSimplifySheets_(spreadsheet_()), className);
+      clearSimplifyDashboardCache_(className);
       return jsonResponse({ ok: true });
     }
     if (action === "saveGeneralTerm") {
@@ -69,6 +121,27 @@ function doPost(e) {
       updateGeneralTermBoss_(sheets.classState, payload.className, Number(payload.addedDamage) || 0);
       SpreadsheetApp.flush();
       clearGeneralTermDashboardCache_(payload.className);
+      return jsonResponse({ ok: true });
+    }
+    if (action === "saveSimplify") {
+      validateRationalPayload_(payload);
+      const receipts = PropertiesService.getScriptProperties();
+      const receiptKey = simplifyReceiptKey_(payload.className, payload.id);
+      const received = JSON.parse(receipts.getProperty(receiptKey) || "[]");
+      if (payload.batchId && received.includes(String(payload.batchId))) return jsonResponse({ ok:true, duplicate:true });
+      const sheets = ensureSimplifySheets_(spreadsheet_());
+      const prior = dataRows_(sheets.player, 10).find((row) => row[0] === payload.className && Number(row[1]) === Number(payload.id));
+      if (payload.levelStats && (!prior || Number(payload.total || 0) >= Number(prior[5]))) receipts.setProperty(`simplify-stats:${payload.className}:${Number(payload.id)}`, JSON.stringify(payload.levelStats));
+      saveSimplifyPlayer_(sheets.player, payload);
+      appendSimplifyAnswers_(sheets.answer, payload);
+      updateSimplifyBoss_(sheets.classState, payload.className, Number(payload.addedDamage) || 0);
+      SpreadsheetApp.flush(); clearSimplifyDashboardCache_(payload.className);
+      if (payload.batchId) receipts.setProperty(receiptKey, JSON.stringify([...received, String(payload.batchId)].slice(-100)));
+      return jsonResponse({ ok: true });
+    }
+    if (action === "saveGem") {
+      validateGemPayload_(payload);
+      saveGemAttempt_(spreadsheet_(), payload);
       return jsonResponse({ ok: true });
     }
     if (action === "resetRationalMixed") {
@@ -702,9 +775,9 @@ function getGeneralTermStudentExportData_(className, studentId) {
 }
 
 function generalTermLevelStats_(answerRows) {
-  const stats = [1,2,3,4,5].map((level) => ({ level, total:0, correct:0, streak:0, accuracy:0 }));
+  const stats = [1,2,3,4,5,6].map((level) => ({ level, total:0, correct:0, streak:0, accuracy:0 }));
   answerRows.forEach((row) => {
-    const item = stats[clamp_(Number(row[4]) || 1, 1, 5) - 1];
+    const item = stats[clamp_(Number(row[4]) || 1, 1, 6) - 1];
     item.total += 1;
     if (row[8] === "是") { item.correct += 1; item.streak += 1; }
     else item.streak = 0;
@@ -726,7 +799,7 @@ function saveGeneralTermPlayer_(sheet, payload) {
   const rowIndex = rows.findIndex((row) => row[0] === payload.className && Number(row[1]) === Number(payload.id));
   const values = [[
     safeText_(payload.className, 12), Number(payload.id), safeText_(payload.name, 30),
-    clamp_(Number(payload.level) || 1, 1, 5), clamp_(Number(payload.xp) || 0, 0, 500),
+    clamp_(Number(payload.level) || 1, 1, 6), clamp_(Number(payload.xp) || 0, 0, 500),
     clamp_(Number(payload.total) || 0, 0, 1000000), clamp_(Number(payload.correct) || 0, 0, 1000000),
     clamp_(Number(payload.streak) || 0, 0, 100000), clamp_(Number(payload.mistakes) || 0, 0, 1000), new Date(),
   ]];
@@ -739,7 +812,7 @@ function appendGeneralTermAnswers_(sheet, payload) {
   if (!answers.length) return;
   const rows = answers.map((answer) => [
     new Date(), safeText_(payload.className, 12), Number(payload.id), safeText_(payload.name, 30),
-    clamp_(Number(answer.level) || 1, 1, 5), safeText_(answer.question, 240),
+    clamp_(Number(answer.level) || 1, 1, 6), safeText_(answer.question, 240),
     safeText_(answer.studentAnswer, 80), safeText_(answer.correctAnswer, 80), answer.isCorrect ? "是" : "否",
   ]);
   sheet.getRange(sheet.getLastRow() + 1, 1, rows.length, 9).setValues(rows);
@@ -993,4 +1066,467 @@ function safeText_(value, maxLength) {
 
 function clamp_(value, min, max) {
   return Math.min(max, Math.max(min, value));
+}
+
+function ensureGemSheets_(spreadsheet) {
+  let player = spreadsheet.getSheetByName(GEM_PLAYER_SHEET);
+  let answer = spreadsheet.getSheetByName(GEM_ANSWER_SHEET);
+  if (!player) { player = spreadsheet.insertSheet(GEM_PLAYER_SHEET); player.appendRow(["班別", "學號", "姓名", "已答對寶石", "最後上線"]); player.setFrozenRows(1); }
+  if (!answer) { answer = spreadsheet.insertSheet(GEM_ANSWER_SHEET); answer.appendRow(["時間", "班別", "學號", "姓名", "寶石編號", "是否答對", "作答識別碼"]); answer.setFrozenRows(1); }
+  return { player, answer };
+}
+
+function validateGemPayload_(payload) {
+  if (!GEM_CLASSES.includes(String(payload.className))) throw new Error("Invalid class");
+  const id = Number(payload.id);
+  if (!Number.isInteger(id) || id < 1 || id > 5) throw new Error("Invalid student id");
+  if (!payload.name || String(payload.name).length > 30) throw new Error("Invalid player name");
+  const gemIndex = Number(payload.gemIndex);
+  if (!Number.isInteger(gemIndex) || gemIndex < 0 || gemIndex > 6) throw new Error("Invalid gem");
+  if (!payload.attemptId || String(payload.attemptId).length > 120) throw new Error("Invalid attempt");
+}
+
+function loadGemPlayer_(className, studentId, name) {
+  if (!GEM_CLASSES.includes(String(className))) throw new Error("Invalid class");
+  const sheets = ensureGemSheets_(spreadsheet_());
+  const id = Number(studentId);
+  let row = dataRows_(sheets.player, 5).find((item) => item[0] === className && Number(item[1]) === id);
+  if (!row && name) { sheets.player.appendRow([className, id, safeText_(name, 30), "[]", new Date()]); row = [className, id, safeText_(name, 30), "[]", new Date()]; }
+  return { progress: { unlocked: row ? gemUnlocked_(row[3]) : [] }, player: row ? { className: row[0], id:Number(row[1]), name:row[2] } : null };
+}
+
+function getGemDashboardData_(className) {
+  if (className && !GEM_CLASSES.includes(String(className))) throw new Error("Invalid class");
+  const sheets = ensureGemSheets_(spreadsheet_());
+  const players = dataRows_(sheets.player, 5).filter((row) => !className || row[0] === className).map((row) => ({ className:row[0], id:Number(row[1]), name:row[2], unlocked:gemUnlocked_(row[3]) }));
+  const attempts = dataRows_(sheets.answer, 7).filter((row) => !className || row[1] === className).map((row) => ({ timestamp:row[0] instanceof Date ? row[0].toISOString() : String(row[0] || ""), className:row[1], id:Number(row[2]), name:row[3], gemIndex:Number(row[4]), isCorrect:row[5] === "是", attemptId:row[6] }));
+  const completedAt = {};
+  attempts.filter((item) => item.isCorrect).forEach((item) => { const key = `${item.className}-${item.id}`; if (!completedAt[key] || item.timestamp > completedAt[key]) completedAt[key] = item.timestamp; });
+  players.forEach((player) => { player.lastCompletedAt = completedAt[`${player.className}-${player.id}`] || ""; });
+  return { players, attempts, gems:gemDashboardGems_(players, attempts) };
+}
+
+function gemDashboardGems_(players, attempts) {
+  const names = ["石","排","灣","公","立","學","校"], titles = ["加法之光","減法之光","奇數之光","倍增之光","縮小之光","三倍之光","正負魔法"];
+  return names.map((char, gemIndex) => {
+    const correctKeys = new Set(players.filter((p) => p.unlocked.includes(gemIndex)).map((p) => `${p.className}-${p.id}`));
+    const wrongKeys = new Set(attempts.filter((a) => a.gemIndex === gemIndex && !a.isCorrect).map((a) => `${a.className}-${a.id}`));
+    correctKeys.forEach((key) => wrongKeys.delete(key));
+    const pending = players.filter((p) => !correctKeys.has(`${p.className}-${p.id}`) && !wrongKeys.has(`${p.className}-${p.id}`));
+    return { char, name:titles[gemIndex], correct:players.filter((p) => correctKeys.has(`${p.className}-${p.id}`)), wrong:players.filter((p) => wrongKeys.has(`${p.className}-${p.id}`)), pending };
+  });
+}
+
+function gemUnlocked_(value) {
+  try { const list = JSON.parse(String(value || "[]")); return Array.isArray(list) ? list.map(Number).filter((n) => Number.isInteger(n) && n >= 0 && n <= 6) : []; } catch (error) { return []; }
+}
+
+function saveGemAttempt_(spreadsheet, payload) {
+  const sheets = ensureGemSheets_(spreadsheet);
+  const attemptRows = dataRows_(sheets.answer, 7);
+  if (attemptRows.some((row) => String(row[6]) === String(payload.attemptId))) return;
+  const playerRows = dataRows_(sheets.player, 5);
+  const index = playerRows.findIndex((row) => row[0] === payload.className && Number(row[1]) === Number(payload.id));
+  const unlocked = index >= 0 ? gemUnlocked_(playerRows[index][3]) : [];
+  if (payload.isCorrect && !unlocked.includes(Number(payload.gemIndex))) unlocked.push(Number(payload.gemIndex));
+  const playerValues = [[safeText_(payload.className, 12), Number(payload.id), safeText_(payload.name, 30), JSON.stringify(unlocked.sort((a, b) => a - b)), new Date()]];
+  if (index >= 0) sheets.player.getRange(index + 2, 1, 1, 5).setValues(playerValues); else sheets.player.getRange(sheets.player.getLastRow() + 1, 1, 1, 5).setValues(playerValues);
+  sheets.answer.getRange(sheets.answer.getLastRow() + 1, 1, 1, 7).setValues([[new Date(), safeText_(payload.className, 12), Number(payload.id), safeText_(payload.name, 30), Number(payload.gemIndex), payload.isCorrect ? "是" : "否", safeText_(payload.attemptId, 120)]]);
+  SpreadsheetApp.flush();
+}
+
+function ensureSimplifySheets_(spreadsheet) {
+  let player = spreadsheet.getSheetByName(SIMPLIFY_PLAYER_SHEET);
+  let answer = spreadsheet.getSheetByName(SIMPLIFY_ANSWER_SHEET);
+  let classState = spreadsheet.getSheetByName(SIMPLIFY_CLASS_SHEET);
+  if (!player) {
+    player = spreadsheet.insertSheet(SIMPLIFY_PLAYER_SHEET);
+    player.appendRow(["班別", "學號", "姓名", "程度", "經驗", "作答數", "答對數", "連勝", "連錯", "最後上線"]);
+    player.setFrozenRows(1);
+  }
+  if (!answer) {
+    answer = spreadsheet.insertSheet(SIMPLIFY_ANSWER_SHEET);
+    answer.appendRow(["時間", "班別", "學號", "姓名", "程度", "題目", "學生答案", "正確答案", "是否正確"]);
+    answer.setFrozenRows(1);
+  }
+  if (!classState) {
+    classState = spreadsheet.insertSheet(SIMPLIFY_CLASS_SHEET);
+    classState.appendRow(["班別", "首領能量", "能量上限", "最後更新"]);
+    RATIONAL_CLASSES.forEach((className) => classState.appendRow([className, SIMPLIFY_BOSS_HP, SIMPLIFY_BOSS_HP, new Date()]));
+    classState.setFrozenRows(1);
+  }
+  return { player, answer, classState };
+}
+
+function simplifyReceiptKey_(className, id) {
+  if (!RATIONAL_CLASSES.includes(className) || !Number.isInteger(Number(id)) || Number(id) < 1 || Number(id) > 34 || (className === "SG1B" && Number(id) === 29)) throw new Error("Invalid student");
+  return `simplify-receipts:${className}:${Number(id)}`;
+}
+
+function loadSimplifyPlayer_(className, studentId) {
+  if (!RATIONAL_CLASSES.includes(className)) throw new Error("Invalid class");
+  const sheets = ensureSimplifySheets_(spreadsheet_());
+  const id = Number(studentId);
+  const row = dataRows_(sheets.player, 10).find((item) => item[0] === className && Number(item[1]) === id);
+  const answerRows = dataRows_(sheets.answer, 9).filter((item) => item[1] === className && Number(item[2]) === id);
+  const classRow = dataRows_(sheets.classState, 4).find((item) => item[0] === className);
+  const state = simplifyStateValues_(classRow);
+  return {
+    player: row ? rationalPlayerFromRow_(row) : null,
+    levelStats: simplifyLevelStats_(answerRows),
+    bossHp: state.bossHp,
+    bossMaxHp: state.bossMaxHp,
+  };
+}
+
+function getSimplifyDashboardData_(className) {
+  if (className && !RATIONAL_CLASSES.includes(className)) throw new Error("Invalid class");
+  const sheets = ensureSimplifySheets_(spreadsheet_());
+  const players = dataRows_(sheets.player, 10)
+    .filter((row) => !className || row[0] === className)
+    .map(rationalPlayerFromRow_);
+  const states = dataRows_(sheets.classState, 4)
+    .filter((row) => !className || row[0] === className)
+    .map(simplifyStateValues_);
+  const answerRows = dataRows_(sheets.answer, 9).filter((row) => !className || row[1] === className);
+  return {
+    players,
+    levelStats: [1,2,3,4,5,6].map((level) => {
+      const result = { level, total:0, correct:0, accuracy:0 };
+      players.forEach((player) => {
+        const stats = simplifyStudentStats_(player.className, player.id, answerRows.filter((row) => row[1] === player.className && Number(row[2]) === player.id));
+        result.total += stats[level - 1].total; result.correct += stats[level - 1].correct;
+      });
+      result.accuracy = result.total ? result.correct / result.total : 0; return result;
+    }),
+    bossHp: states.reduce((sum, state) => sum + state.bossHp, 0),
+    bossMaxHp: states.reduce((sum, state) => sum + state.bossMaxHp, 0) || SIMPLIFY_BOSS_HP,
+  };
+}
+
+function getCachedSimplifyDashboardData_(className) {
+  const cache = CacheService.getScriptCache();
+  const key = simplifyDashboardCacheKey_(className);
+  const cached = cache.get(key);
+  if (cached) return JSON.parse(cached);
+  const data = getSimplifyDashboardData_(className);
+  cache.put(key, JSON.stringify(data), DASHBOARD_CACHE_SECONDS);
+  return data;
+}
+
+function getSimplifyExportData_(className) {
+  if (className && !RATIONAL_CLASSES.includes(className)) throw new Error("Invalid class");
+  const sheets = ensureSimplifySheets_(spreadsheet_());
+  const players = dataRows_(sheets.player, 10)
+    .filter((row) => !className || row[0] === className)
+    .map(rationalPlayerFromRow_);
+  const answers = dataRows_(sheets.answer, 9)
+    .filter((row) => !className || row[1] === className)
+    .map(simplifyAnswerFromRow_);
+  return { players, answers };
+}
+
+function getSimplifyStudentExportData_(className, studentId) {
+  if (!RATIONAL_CLASSES.includes(className)) throw new Error("Invalid class");
+  const id = Number(studentId);
+  if (!Number.isInteger(id) || id < 1 || id > 34 || (className === "SG1B" && id === 29)) throw new Error("Invalid student id");
+  const sheets = ensureSimplifySheets_(spreadsheet_());
+  const row = dataRows_(sheets.player, 10).find((item) => item[0] === className && Number(item[1]) === id);
+  const answerRows = dataRows_(sheets.answer, 9).filter((item) => item[1] === className && Number(item[2]) === id);
+  return {
+    player: row ? rationalPlayerFromRow_(row) : null,
+    levelStats: simplifyStudentStats_(className, id, answerRows),
+    wrongAnswers: answerRows.filter((item) => item[8] !== "是").map((item) => ({
+      timestamp:item[0] instanceof Date ? item[0].toISOString() : String(item[0] || ""),
+      level:Number(item[4]) || 1, question:item[5], studentAnswer:item[6], correctAnswer:item[7],
+    })),
+  };
+}
+
+function simplifyStudentStats_(className, id, answerRows) {
+  const saved = JSON.parse(PropertiesService.getScriptProperties().getProperty(`simplify-stats:${className}:${Number(id)}`) || "{}");
+  return simplifyLevelStats_(answerRows).map((stats) => {
+    const baseline = saved[stats.level];
+    if (baseline && Number(baseline.total) > stats.total) return { level:stats.level, total:Number(baseline.total), correct:Number(baseline.correct) || 0, streak:Number(baseline.streak) || 0, accuracy:Number(baseline.correct || 0) / Number(baseline.total) };
+    return stats;
+  });
+}
+
+function simplifyLevelStats_(answerRows) {
+  const stats = [1,2,3,4,5,6].map((level) => ({ level, total:0, correct:0, streak:0, accuracy:0 }));
+  answerRows.forEach((row) => {
+    const item = stats[clamp_(Number(row[4]) || 1, 1, 6) - 1];
+    item.total += 1;
+    if (row[8] === "是") { item.correct += 1; item.streak += 1; }
+    else item.streak = 0;
+  });
+  stats.forEach((item) => { item.accuracy = item.total ? item.correct / item.total : 0; });
+  return stats;
+}
+
+function simplifyAnswerFromRow_(row) {
+  return {
+    timestamp:row[0] instanceof Date ? row[0].toISOString() : String(row[0] || ""),
+    className:row[1], id:Number(row[2]), name:row[3], level:Number(row[4]) || 1,
+    question:row[5], studentAnswer:row[6], correctAnswer:row[7], isCorrect:row[8] === "是",
+  };
+}
+
+function saveSimplifyPlayer_(sheet, payload) {
+  const rows = dataRows_(sheet, 10);
+  const rowIndex = rows.findIndex((row) => row[0] === payload.className && Number(row[1]) === Number(payload.id));
+  if (rowIndex >= 0 && Number(rows[rowIndex][5]) > Number(payload.total || 0)) return;
+  const values = [[
+    safeText_(payload.className, 12), Number(payload.id), safeText_(payload.name, 30),
+    clamp_(Number(payload.level) || 1, 1, 6), clamp_(Number(payload.xp) || 0, 0, 500),
+    clamp_(Number(payload.total) || 0, 0, 1000000), clamp_(Number(payload.correct) || 0, 0, 1000000),
+    clamp_(Number(payload.streak) || 0, 0, 100000), clamp_(Number(payload.mistakes) || 0, 0, 1000), new Date(),
+  ]];
+  if (rowIndex >= 0) sheet.getRange(rowIndex + 2, 1, 1, 10).setValues(values);
+  else sheet.getRange(sheet.getLastRow() + 1, 1, 1, 10).setValues(values);
+}
+
+function appendSimplifyAnswers_(sheet, payload) {
+  const answers = Array.isArray(payload.answers) ? payload.answers.slice(0, 10) : [];
+  if (!answers.length) return;
+  const rows = answers.map((answer) => [
+    new Date(), safeText_(payload.className, 12), Number(payload.id), safeText_(payload.name, 30),
+    clamp_(Number(answer.level) || 1, 1, 6), safeText_(answer.question, 240),
+    safeText_(answer.studentAnswer, 80), safeText_(answer.correctAnswer, 80), answer.isCorrect ? "是" : "否",
+  ]);
+  sheet.getRange(sheet.getLastRow() + 1, 1, rows.length, 9).setValues(rows);
+}
+
+function updateSimplifyBoss_(sheet, className, damage) {
+  const rows = dataRows_(sheet, 4);
+  const index = rows.findIndex((row) => row[0] === className);
+  if (index < 0) return;
+  const state = simplifyStateValues_(rows[index]);
+  sheet.getRange(index + 2, 2, 1, 3).setValues([[Math.max(0, state.bossHp - clamp_(damage, 0, 100)), state.bossMaxHp, new Date()]]);
+}
+
+function simplifyStateValues_(row) {
+  if (!row) return { bossHp:SIMPLIFY_BOSS_HP, bossMaxHp:SIMPLIFY_BOSS_HP };
+  const previousMax = Math.max(1, Number(row[2]) || SIMPLIFY_BOSS_HP);
+  const previousHp = Math.max(0, Math.min(previousMax, Number.isFinite(Number(row[1])) ? Number(row[1]) : previousMax));
+  return { bossHp:Math.max(0, SIMPLIFY_BOSS_HP - (previousMax - previousHp)), bossMaxHp:SIMPLIFY_BOSS_HP };
+}
+
+function resetSimplifyData_(sheets, className) {
+  const properties = PropertiesService.getScriptProperties();
+  Object.keys(properties.getProperties()).filter((key) => key.startsWith("simplify-stats:") && (!className || key.startsWith(`simplify-stats:${className}:`))).forEach((key) => properties.deleteProperty(key));
+  rewriteRationalRows_(sheets.player, 10, (row) => className && row[0] !== className);
+  rewriteRationalRows_(sheets.answer, 9, (row) => className && row[1] !== className);
+  dataRows_(sheets.classState, 4).forEach((row, index) => {
+    if (!className || row[0] === className) sheets.classState.getRange(index + 2, 2, 1, 3).setValues([[SIMPLIFY_BOSS_HP, SIMPLIFY_BOSS_HP, new Date()]]);
+  });
+  SpreadsheetApp.flush();
+}
+
+function clearSimplifyDashboardCache_(className) {
+  const keys = [simplifyDashboardCacheKey_(""), simplifyDashboardCacheKey_(className)];
+  if (!className) RATIONAL_CLASSES.forEach((item) => keys.push(simplifyDashboardCacheKey_(item)));
+  CacheService.getScriptCache().removeAll(keys);
+}
+
+function simplifyDashboardCacheKey_(className) {
+  return `simplify-dashboard:${encodeURIComponent(className || "all")}`;
+}
+
+function ensureNthTermSheets_(spreadsheet) {
+  let player = spreadsheet.getSheetByName(NTH_TERM_PLAYER_SHEET);
+  let answer = spreadsheet.getSheetByName(NTH_TERM_ANSWER_SHEET);
+  let classState = spreadsheet.getSheetByName(NTH_TERM_CLASS_SHEET);
+  if (!player) {
+    player = spreadsheet.insertSheet(NTH_TERM_PLAYER_SHEET);
+    player.appendRow(["班別", "學號", "姓名", "程度", "經驗", "作答數", "答對數", "連勝", "連錯", "最後上線"]);
+    player.setFrozenRows(1);
+  }
+  if (!answer) {
+    answer = spreadsheet.insertSheet(NTH_TERM_ANSWER_SHEET);
+    answer.appendRow(["時間", "班別", "學號", "姓名", "程度", "題目", "學生答案", "正確答案", "是否正確"]);
+    answer.setFrozenRows(1);
+  }
+  if (!classState) {
+    classState = spreadsheet.insertSheet(NTH_TERM_CLASS_SHEET);
+    classState.appendRow(["班別", "首領能量", "能量上限", "最後更新"]);
+    RATIONAL_CLASSES.forEach((className) => classState.appendRow([className, NTH_TERM_BOSS_HP, NTH_TERM_BOSS_HP, new Date()]));
+    classState.setFrozenRows(1);
+  }
+  return { player, answer, classState };
+}
+
+function nthTermReceiptKey_(className, id) {
+  if (!RATIONAL_CLASSES.includes(className) || !Number.isInteger(Number(id)) || Number(id) < 1 || Number(id) > 34 || (className === "SG1B" && Number(id) === 29)) throw new Error("Invalid student");
+  return `nth-term-receipts:${className}:${Number(id)}`;
+}
+
+function loadNthTermPlayer_(className, studentId) {
+  if (!RATIONAL_CLASSES.includes(className)) throw new Error("Invalid class");
+  const sheets = ensureNthTermSheets_(spreadsheet_());
+  const id = Number(studentId);
+  const row = dataRows_(sheets.player, 10).find((item) => item[0] === className && Number(item[1]) === id);
+  const answerRows = dataRows_(sheets.answer, 9).filter((item) => item[1] === className && Number(item[2]) === id);
+  const classRow = dataRows_(sheets.classState, 4).find((item) => item[0] === className);
+  const state = nthTermStateValues_(classRow);
+  return {
+    player: row ? rationalPlayerFromRow_(row) : null,
+    levelStats: nthTermLevelStats_(answerRows),
+    bossHp: state.bossHp,
+    bossMaxHp: state.bossMaxHp,
+  };
+}
+
+function getNthTermDashboardData_(className) {
+  if (className && !RATIONAL_CLASSES.includes(className)) throw new Error("Invalid class");
+  const sheets = ensureNthTermSheets_(spreadsheet_());
+  const players = dataRows_(sheets.player, 10)
+    .filter((row) => !className || row[0] === className)
+    .map(rationalPlayerFromRow_);
+  const states = dataRows_(sheets.classState, 4)
+    .filter((row) => !className || row[0] === className)
+    .map(nthTermStateValues_);
+  const answerRows = dataRows_(sheets.answer, 9).filter((row) => !className || row[1] === className);
+  return {
+    players,
+    levelStats: [1,2,3,4,5].map((level) => {
+      const result = { level, total:0, correct:0, accuracy:0 };
+      players.forEach((player) => {
+        const stats = nthTermStudentStats_(player.className, player.id, answerRows.filter((row) => row[1] === player.className && Number(row[2]) === player.id));
+        result.total += stats[level - 1].total; result.correct += stats[level - 1].correct;
+      });
+      result.accuracy = result.total ? result.correct / result.total : 0; return result;
+    }),
+    bossHp: states.reduce((sum, state) => sum + state.bossHp, 0),
+    bossMaxHp: states.reduce((sum, state) => sum + state.bossMaxHp, 0) || NTH_TERM_BOSS_HP,
+  };
+}
+
+function getCachedNthTermDashboardData_(className) {
+  const cache = CacheService.getScriptCache();
+  const key = nthTermDashboardCacheKey_(className);
+  const cached = cache.get(key);
+  if (cached) return JSON.parse(cached);
+  const data = getNthTermDashboardData_(className);
+  cache.put(key, JSON.stringify(data), DASHBOARD_CACHE_SECONDS);
+  return data;
+}
+
+function getNthTermExportData_(className) {
+  if (className && !RATIONAL_CLASSES.includes(className)) throw new Error("Invalid class");
+  const sheets = ensureNthTermSheets_(spreadsheet_());
+  const players = dataRows_(sheets.player, 10)
+    .filter((row) => !className || row[0] === className)
+    .map(rationalPlayerFromRow_);
+  const answers = dataRows_(sheets.answer, 9)
+    .filter((row) => !className || row[1] === className)
+    .map(nthTermAnswerFromRow_);
+  return { players, answers };
+}
+
+function getNthTermStudentExportData_(className, studentId) {
+  if (!RATIONAL_CLASSES.includes(className)) throw new Error("Invalid class");
+  const id = Number(studentId);
+  if (!Number.isInteger(id) || id < 1 || id > 34 || (className === "SG1B" && id === 29)) throw new Error("Invalid student id");
+  const sheets = ensureNthTermSheets_(spreadsheet_());
+  const row = dataRows_(sheets.player, 10).find((item) => item[0] === className && Number(item[1]) === id);
+  const answerRows = dataRows_(sheets.answer, 9).filter((item) => item[1] === className && Number(item[2]) === id);
+  return {
+    player: row ? rationalPlayerFromRow_(row) : null,
+    levelStats: nthTermStudentStats_(className, id, answerRows),
+    wrongAnswers: answerRows.filter((item) => item[8] !== "是").map((item) => ({
+      timestamp:item[0] instanceof Date ? item[0].toISOString() : String(item[0] || ""),
+      level:Number(item[4]) || 1, question:item[5], studentAnswer:item[6], correctAnswer:item[7],
+    })),
+  };
+}
+
+function nthTermStudentStats_(className, id, answerRows) {
+  const saved = JSON.parse(PropertiesService.getScriptProperties().getProperty(`nth-term-stats:${className}:${Number(id)}`) || "{}");
+  return nthTermLevelStats_(answerRows).map((stats) => {
+    const baseline = saved[stats.level];
+    if (baseline && Number(baseline.total) > stats.total) return { level:stats.level, total:Number(baseline.total), correct:Number(baseline.correct) || 0, streak:Number(baseline.streak) || 0, accuracy:Number(baseline.correct || 0) / Number(baseline.total) };
+    return stats;
+  });
+}
+
+function nthTermLevelStats_(answerRows) {
+  const stats = [1,2,3,4,5].map((level) => ({ level, total:0, correct:0, streak:0, accuracy:0 }));
+  answerRows.forEach((row) => {
+    const item = stats[clamp_(Number(row[4]) || 1, 1, 5) - 1];
+    item.total += 1;
+    if (row[8] === "是") { item.correct += 1; item.streak += 1; }
+    else item.streak = 0;
+  });
+  stats.forEach((item) => { item.accuracy = item.total ? item.correct / item.total : 0; });
+  return stats;
+}
+
+function nthTermAnswerFromRow_(row) {
+  return {
+    timestamp:row[0] instanceof Date ? row[0].toISOString() : String(row[0] || ""),
+    className:row[1], id:Number(row[2]), name:row[3], level:Number(row[4]) || 1,
+    question:row[5], studentAnswer:row[6], correctAnswer:row[7], isCorrect:row[8] === "是",
+  };
+}
+
+function saveNthTermPlayer_(sheet, payload) {
+  const rows = dataRows_(sheet, 10);
+  const rowIndex = rows.findIndex((row) => row[0] === payload.className && Number(row[1]) === Number(payload.id));
+  if (rowIndex >= 0 && Number(rows[rowIndex][5]) > Number(payload.total || 0)) return;
+  const values = [[
+    safeText_(payload.className, 12), Number(payload.id), safeText_(payload.name, 30),
+    clamp_(Number(payload.level) || 1, 1, 5), clamp_(Number(payload.xp) || 0, 0, 500),
+    clamp_(Number(payload.total) || 0, 0, 1000000), clamp_(Number(payload.correct) || 0, 0, 1000000),
+    clamp_(Number(payload.streak) || 0, 0, 100000), clamp_(Number(payload.mistakes) || 0, 0, 1000), new Date(),
+  ]];
+  if (rowIndex >= 0) sheet.getRange(rowIndex + 2, 1, 1, 10).setValues(values);
+  else sheet.getRange(sheet.getLastRow() + 1, 1, 1, 10).setValues(values);
+}
+
+function appendNthTermAnswers_(sheet, payload) {
+  const answers = Array.isArray(payload.answers) ? payload.answers.slice(0, 10) : [];
+  if (!answers.length) return;
+  const rows = answers.map((answer) => [
+    new Date(), safeText_(payload.className, 12), Number(payload.id), safeText_(payload.name, 30),
+    clamp_(Number(answer.level) || 1, 1, 5), safeText_(answer.question, 240),
+    safeText_(answer.studentAnswer, 80), safeText_(answer.correctAnswer, 80), answer.isCorrect ? "是" : "否",
+  ]);
+  sheet.getRange(sheet.getLastRow() + 1, 1, rows.length, 9).setValues(rows);
+}
+
+function updateNthTermBoss_(sheet, className, damage) {
+  const rows = dataRows_(sheet, 4);
+  const index = rows.findIndex((row) => row[0] === className);
+  if (index < 0) return;
+  const state = nthTermStateValues_(rows[index]);
+  sheet.getRange(index + 2, 2, 1, 3).setValues([[Math.max(0, state.bossHp - clamp_(damage, 0, 450)), state.bossMaxHp, new Date()]]);
+}
+
+function nthTermStateValues_(row) {
+  if (!row) return { bossHp:NTH_TERM_BOSS_HP, bossMaxHp:NTH_TERM_BOSS_HP };
+  const previousMax = Math.max(1, Number(row[2]) || NTH_TERM_BOSS_HP);
+  const previousHp = Math.max(0, Math.min(previousMax, Number.isFinite(Number(row[1])) ? Number(row[1]) : previousMax));
+  return { bossHp:Math.max(0, NTH_TERM_BOSS_HP - (previousMax - previousHp)), bossMaxHp:NTH_TERM_BOSS_HP };
+}
+
+function resetNthTermData_(sheets, className) {
+  const properties = PropertiesService.getScriptProperties();
+  Object.keys(properties.getProperties()).filter((key) => key.startsWith("nth-term-stats:") && (!className || key.startsWith(`nth-term-stats:${className}:`))).forEach((key) => properties.deleteProperty(key));
+  rewriteRationalRows_(sheets.player, 10, (row) => className && row[0] !== className);
+  rewriteRationalRows_(sheets.answer, 9, (row) => className && row[1] !== className);
+  dataRows_(sheets.classState, 4).forEach((row, index) => {
+    if (!className || row[0] === className) sheets.classState.getRange(index + 2, 2, 1, 3).setValues([[NTH_TERM_BOSS_HP, NTH_TERM_BOSS_HP, new Date()]]);
+  });
+  SpreadsheetApp.flush();
+}
+
+function clearNthTermDashboardCache_(className) {
+  const keys = [nthTermDashboardCacheKey_(""), nthTermDashboardCacheKey_(className)];
+  if (!className) RATIONAL_CLASSES.forEach((item) => keys.push(nthTermDashboardCacheKey_(item)));
+  CacheService.getScriptCache().removeAll(keys);
+}
+
+function nthTermDashboardCacheKey_(className) {
+  return `nth-term-dashboard:${encodeURIComponent(className || "all")}`;
 }

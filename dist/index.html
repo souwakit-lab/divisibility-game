@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>石排灣魔法冒險｜學生入口</title>
+  <link rel="stylesheet" href="shell.css">
+</head>
+<body>
+  <div class="shell-bg"></div>
+  <main class="student-shell">
+    <section class="login-card" id="login-card">
+      <div class="crest">💎</div>
+      <p class="eyebrow">SEQUENCE QUEST · STUDENT ENTRY</p>
+      <h1>石排灣魔法冒險</h1>
+      <p class="lead">登入後開始七寶石數列解謎。每次提交都會即時回傳給老師大屏。</p>
+      <div class="login-grid">
+        <label>班別<select id="class-select"></select></label>
+        <label>學號<select id="id-select"></select></label>
+      </div>
+      <div class="student-preview" id="student-preview">請選擇班別與學號</div>
+      <button class="primary" id="login-button">進入魔法冒險</button>
+      <p class="login-status" id="login-status"></p>
+    </section>
+    <section class="game-frame" id="game-frame" hidden>
+      <div class="game-toolbar">
+        <span id="identity"></span>
+        <button class="toolbar-button" id="logout-button">切換學生</button>
+      </div>
+      <iframe id="game-iframe" title="七寶石數列解謎" src="game.html" loading="eager"></iframe>
+    </section>
+  </main>
+  <script src="config.js"></script>
+  <script src="gem-app.js"></script>
+</body>
+</html>
