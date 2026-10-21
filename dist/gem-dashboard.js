@@ -12,7 +12,7 @@ const STUDENTS = Object.fromEntries(Object.entries(STUDENT_NAMES).map(([classNam
 const $ = (id) => document.getElementById(id); let latest = null;
 function init() {
   Object.keys(STUDENTS).forEach((cls) => $("class-filter").add(new Option(cls, cls)));
-  $("class-filter").addEventListener("change", refresh); $("close-modal").addEventListener("click", closeModal); $("modal-backdrop").addEventListener("click", (e) => { if (e.target.id === "modal-backdrop") closeModal(); }); document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
+  $("class-filter").addEventListener("change", refresh); $("reset-button").addEventListener("click", resetData); $("close-modal").addEventListener("click", closeModal); $("modal-backdrop").addEventListener("click", (e) => { if (e.target.id === "modal-backdrop") closeModal(); }); document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
   refresh(); window.setInterval(refresh, 6000); document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh(); });
 }
 async function refresh() {
@@ -31,8 +31,8 @@ function buildData(players, attempts) {
   return { players, attempts, gems };
 }
 function render(data) {
-  $("stat-players").textContent = data.players.length; $("updated-at").textContent = new Date().toLocaleTimeString("zh-Hant", {hour:"2-digit", minute:"2-digit", second:"2-digit"});
-  $("gem-grid").innerHTML = data.gems.map((g, i) => `<button class="gem-card" style="--gem:${g.color}" data-gem="${i}" aria-label="查看「${g.char}」${g.name}名單"><span class="gem-icon">💎</span><span class="count">${g.correct.length} 人答對</span><h2>「${g.char}」${g.name}</h2><span class="gem-hint">點擊查看答對、答錯及未答對名單</span></button>`).join("");
+  $("stat-players").textContent = data.players.length; $("stat-gems").textContent = data.players.reduce((sum, player) => sum + player.unlocked.length, 0); $("updated-at").textContent = new Date().toLocaleTimeString("zh-Hant", {hour:"2-digit", minute:"2-digit", second:"2-digit"});
+  $("gem-grid").innerHTML = data.gems.map((g, i) => `<button class="gem-card" style="--gem:${g.color}" data-gem="${i}" aria-label="查看「${g.char}」名單"><span class="gem-label">「${g.char}」</span><span class="count">${g.correct.length}人答對</span></button>`).join("");
   const ranking = [...data.players].sort((a, b) => b.unlocked.length - a.unlocked.length || String(a.lastCompletedAt || "9999").localeCompare(String(b.lastCompletedAt || "9999")) || String(a.name).localeCompare(String(b.name)));
   $("leaderboard").innerHTML = ranking.length ? ranking.map((p, i) => `<div class="leader-row"><span class="rank">${i + 1}</span><span class="name">${escapeHtml(p.name)}<small>${escapeHtml(p.className)} ${p.id}號</small></span><span class="score">${p.unlocked.length} 顆</span></div>`).join("") : '<div class="person">尚未有學生登入</div>';
   document.querySelectorAll("[data-gem]").forEach((button) => button.addEventListener("click", () => openModal(data.gems[Number(button.dataset.gem)])));
@@ -40,5 +40,25 @@ function render(data) {
 function openModal(gem) { $("modal-content").innerHTML = `<h2>💎 「${gem.char}」${gem.name}</h2><p>答對後會自動離開答錯名單。</p>${roster("已答對名單", gem.correct, "correct")}${roster("答錯名單", gem.wrong, "wrong")}${roster("未答對名單", gem.pending, "pending")}`; $("modal-backdrop").hidden = false; }
 function roster(title, list, cls) { return `<div class="roster-section"><h3 class="${cls}">${title}（${list.length}）</h3><div class="roster-list">${list.length ? list.map((p) => `<div class="person">${escapeHtml(p.name)}<small>${escapeHtml(p.className)} ${p.id}號</small></div>`).join("") : '<div class="person">暫無學生</div>'}</div></div>`; }
 function closeModal() { $("modal-backdrop").hidden = true; }
+async function resetData() {
+  const className = $("class-filter").value;
+  const label = className || "全部班別";
+  if (!window.confirm(`確定要重置${label}的七寶石數據嗎？此操作不能復原。`)) return;
+  const button = $("reset-button"); button.disabled = true; button.textContent = "重置中…";
+  try {
+    if (API_URL) {
+      const response = await fetch(API_URL, { method:"POST", headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8"}, body:`action=resetGem&data=${encodeURIComponent(JSON.stringify({className}))}` });
+      const result = await response.json(); if (!result.ok) throw new Error(result.error || "remote reset failed");
+    }
+    resetLocalData(className); await refresh();
+  } catch (error) { console.error(error); resetLocalData(className); await refresh(); $("updated-at").textContent = "已重置本機資料"; }
+  button.disabled = false; button.textContent = "重置數據";
+}
+function resetLocalData(className) {
+  if (!className) { localStorage.removeItem(LOCAL_KEY); return; }
+  const db = (() => { try { return JSON.parse(localStorage.getItem(LOCAL_KEY)) || {players:{},attempts:[]}; } catch { return {players:{},attempts:[]}; } })();
+  Object.keys(db.players || {}).forEach((key) => { if (db.players[key].className === className) delete db.players[key]; });
+  db.attempts = (db.attempts || []).filter((attempt) => attempt.className !== className); localStorage.setItem(LOCAL_KEY, JSON.stringify(db));
+}
 function escapeHtml(value) { const el=document.createElement("span"); el.textContent=value; return el.innerHTML; }
 document.addEventListener("DOMContentLoaded", init);

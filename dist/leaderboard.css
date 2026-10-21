@@ -2,5 +2,6 @@
 .summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 .gem-card{display:block;width:100%;text-align:left;font:inherit;color:var(--ink);cursor:pointer;transition:transform .16s ease,box-shadow .16s ease}
 .gem-card:hover,.gem-card:focus-visible{transform:translateY(-3px);box-shadow:0 20px 48px #0007;outline:2px solid var(--gem)}
-.gem-hint{display:block;margin-top:15px;color:var(--muted);font-size:12px}
+.gem-label{display:block;font-size:clamp(28px,3vw,42px);font-weight:900;color:var(--ink)}
+.gem-card .count{position:static;display:block;margin-top:12px;font-size:clamp(20px,2vw,28px)}
 .dashboard-note{display:none}

@@ -144,6 +144,12 @@ function doPost(e) {
       saveGemAttempt_(spreadsheet_(), payload);
       return jsonResponse({ ok: true });
     }
+    if (action === "resetGem") {
+      const className = String(payload.className || "");
+      if (className && !GEM_CLASSES.includes(className)) throw new Error("Invalid class");
+      resetGemData_(spreadsheet_(), className);
+      return jsonResponse({ ok: true });
+    }
     if (action === "resetRationalMixed") {
       const className = String(payload.className || "");
       if (className && !RATIONAL_CLASSES.includes(className)) throw new Error("Invalid class");
@@ -1079,11 +1085,27 @@ function ensureGemSheets_(spreadsheet) {
 function validateGemPayload_(payload) {
   if (!GEM_CLASSES.includes(String(payload.className))) throw new Error("Invalid class");
   const id = Number(payload.id);
-  if (!Number.isInteger(id) || id < 1 || id > 5) throw new Error("Invalid student id");
+  if (!Number.isInteger(id) || id < 1 || id > 34 || (String(payload.className) === "SG1B" && id === 29)) throw new Error("Invalid student id");
   if (!payload.name || String(payload.name).length > 30) throw new Error("Invalid player name");
   const gemIndex = Number(payload.gemIndex);
   if (!Number.isInteger(gemIndex) || gemIndex < 0 || gemIndex > 6) throw new Error("Invalid gem");
   if (!payload.attemptId || String(payload.attemptId).length > 120) throw new Error("Invalid attempt");
+}
+
+function resetGemData_(spreadsheet, className) {
+  const sheets = ensureGemSheets_(spreadsheet);
+  const targets = [
+    { sheet: sheets.player, classColumn: 0 },
+    { sheet: sheets.answer, classColumn: 1 },
+  ];
+  targets.forEach(({ sheet, classColumn }) => {
+    const lastRow = sheet.getLastRow();
+    if (lastRow < 2) return;
+    if (!className) { sheet.getRange(2, 1, lastRow - 1, sheet.getLastColumn()).clearContent(); return; }
+    const rows = sheet.getRange(2, 1, lastRow - 1, sheet.getLastColumn()).getValues();
+    for (let index = rows.length - 1; index >= 0; index--) if (String(rows[index][classColumn]) === className) sheet.deleteRow(index + 2);
+  });
+  SpreadsheetApp.flush();
 }
 
 function loadGemPlayer_(className, studentId, name) {
