@@ -31,21 +31,42 @@ async function login() {
   if (!name) return;
   const button = $("login-button"); button.disabled = true; $("login-status").textContent = "正在讀取你的寶石進度…";
   try {
-    const remote = API_URL ? await fetchJson(`${API_URL}?action=loadGemPlayer&className=${encodeURIComponent(className)}&id=${id}&name=${encodeURIComponent(name)}`) : null;
-    const loaded = remote?.progress ? remote : loadLocal(className, id, name);
+    const loaded = loadLocal(className, id, name);
     const unlocked = Array.isArray(loaded?.progress?.unlocked) ? loaded.progress.unlocked : [];
-    current = { className, id, name, unlocked };
+    current = { className, id, name, unlocked, sessionUnlocked:[] };
     localStorage.setItem(GAME_KEY, JSON.stringify(unlocked));
     $("identity").textContent = `${className} ${id} 號｜${name}`;
     $("login-card").hidden = true; $("game-frame").hidden = false;
-    $("game-iframe").contentWindow.location.reload();
+    $("game-iframe").src = $("game-iframe").dataset.src;
+    window.scrollTo(0, 0);
+    syncLoginProgress(current);
   } catch (error) {
     console.error(error); $("login-status").textContent = "資料連線失敗，請稍後再試。"; button.disabled = false;
+  }
+}
+async function syncLoginProgress(student) {
+  if (!API_URL) return;
+  $("sync-status").textContent = "正在同步進度…";
+  try {
+    const remote = await fetchJson(`${API_URL}?action=loadGemPlayer&className=${encodeURIComponent(student.className)}&id=${student.id}&name=${encodeURIComponent(student.name)}`);
+    if (!Array.isArray(remote?.progress?.unlocked)) throw new Error("Invalid progress response");
+    if (current !== student) return;
+    student.unlocked = [...new Set([...remote.progress.unlocked, ...student.sessionUnlocked])];
+    const db = readDb();
+    db.players[`${student.className}-${student.id}`] = {className:student.className,id:student.id,name:student.name,unlocked:student.unlocked};
+    localStorage.setItem(LOCAL_KEY, JSON.stringify(db));
+    localStorage.setItem(GAME_KEY, JSON.stringify(student.unlocked));
+    $("game-iframe").contentWindow.applyClassroomProgress?.(student.unlocked);
+    $("sync-status").textContent = "";
+  } catch (error) {
+    console.warn("進度同步失敗", error);
+    if (current === student) $("sync-status").textContent = "暫用本機進度，雲端尚未連線";
   }
 }
 function attachGameListener() {
   const frame = $("game-iframe"), doc = frame.contentDocument;
   if (!doc) return;
+  if (current) frame.contentWindow.applyClassroomProgress?.(current.unlocked);
   const reset = doc.getElementById("reset"); if (reset) reset.hidden = true;
   doc.addEventListener("click", (event) => {
     const button = event.target.closest?.("#verify");
@@ -65,12 +86,16 @@ function attachGameListener() {
   }, true);
 }
 async function sendAttempt(payload) {
-  if (!API_URL) saveLocalAttempt(payload);
+  if (payload.isCorrect && current) {
+    if (!current.sessionUnlocked.includes(payload.gemIndex)) current.sessionUnlocked.push(payload.gemIndex);
+    if (!current.unlocked.includes(payload.gemIndex)) current.unlocked.push(payload.gemIndex);
+  }
+  saveLocalAttempt(payload);
   try {
     if (API_URL) { const response = await fetch(API_URL, { method:"POST", headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8"}, body:`action=saveGem&data=${encodeURIComponent(JSON.stringify(payload))}` }); const result = await response.json(); if (!result.ok) throw new Error(result.error || "remote save failed"); }
   } catch (error) { console.warn("資料尚未送出，已保留本機紀錄", error); saveLocalAttempt(payload); }
 }
-async function fetchJson(url) { const response = await fetch(url, { cache:"no-store" }); if (!response.ok) throw new Error("request failed"); return response.json(); }
+async function fetchJson(url) { const response = await fetch(url, { cache:"no-store", signal:AbortSignal.timeout(15000) }); if (!response.ok) throw new Error("request failed"); return response.json(); }
 function emptyDb() { return { players:{}, attempts:[] }; }
 function readDb() { try { return JSON.parse(localStorage.getItem(LOCAL_KEY)) || emptyDb(); } catch { return emptyDb(); } }
 function loadLocal(className, id, name) {
