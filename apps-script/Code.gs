@@ -31,7 +31,7 @@ const NTH_TERM_CLASS_SHEET = "通項公式訓練班級狀態";
 const NTH_TERM_BOSS_HP = 300000;
 const GEM_PLAYER_SHEET = "七寶石學生進度";
 const GEM_ANSWER_SHEET = "七寶石作答紀錄";
-const GEM_CLASSES = ["高一甲", "高一乙", "高一丙", "高一丁"];
+const GEM_CLASSES = ["SG1A", "SG1B"];
 
 function doGet(e) {
   const action = String(e.parameter.action || "");

@@ -1,18 +1,12 @@
 const API_URL = window.DIVISIBILITY_CONFIG?.apiUrl || "";
 const LOCAL_KEY = "gem-adventure-classroom-v1";
 const GAME_KEY = "seven_school_gems_math_doc_v4";
-const STUDENTS = {
-  "高一甲": {1:"高斯",2:"歐拉",3:"牛頓",4:"笛卡兒",5:"費馬"},
-  "高一乙": {1:"畢達哥拉斯",2:"歐幾里得",3:"阿基米德",4:"泰勒斯",5:"希帕提婭"},
-  "高一丙": {1:"拉馬努金",2:"萊布尼茲",3:"黎曼",4:"龐加萊",5:"希爾伯特"},
-  "高一丁": {1:"伽羅瓦",2:"阿貝爾",3:"康托爾",4:"諾特",5:"圖靈"},
-};
+const STUDENTS = Object.fromEntries(["SG1A","SG1B"].map((className) => [className, Object.fromEntries(Array.from({length:34}, (_, index) => index + 1).filter((id) => !(className === "SG1B" && id === 29)).map((id) => [id, `${className} ${id}號`]))]));
 const $ = (id) => document.getElementById(id);
 let current = null;
 
 function init() {
   Object.keys(STUDENTS).forEach((cls) => $("class-select").add(new Option(cls, cls)));
-  for (let id = 1; id <= 5; id += 1) $("id-select").add(new Option(`${id} 號`, id));
   $("class-select").addEventListener("change", updatePreview);
   $("id-select").addEventListener("change", updatePreview);
   $("login-button").addEventListener("click", login);
@@ -21,7 +15,11 @@ function init() {
   updatePreview();
 }
 function updatePreview() {
-  const cls = $("class-select").value, id = Number($("id-select").value);
+  const cls = $("class-select").value, previous = Number($("id-select").value) || 1;
+  $("id-select").innerHTML = "";
+  Object.keys(STUDENTS[cls] || {}).forEach((id) => $("id-select").add(new Option(`${id} 號`, id)));
+  if (STUDENTS[cls]?.[previous]) $("id-select").value = String(previous);
+  const id = Number($("id-select").value);
   $("student-preview").textContent = STUDENTS[cls]?.[id] ? `${cls} · ${id} 號 · ${STUDENTS[cls][id]}` : "請選擇班別與學號";
 }
 async function login() {
