@@ -4,7 +4,9 @@
 .gem-card{background:linear-gradient(160deg,color-mix(in srgb,var(--gem) 42%,#2e2942),#151a31 78%);box-shadow:0 16px 40px #0005,0 0 22px color-mix(in srgb,var(--gem) 35%,transparent)}
 .gem-card:hover,.gem-card:focus-visible{transform:translateY(-3px);box-shadow:0 20px 48px #0007;outline:2px solid var(--gem)}
 .gem-dashboard{grid-template-columns:repeat(7,minmax(0,1fr));gap:10px}
-.gem-card{padding:18px 8px;min-height:82px;display:grid;place-items:center}
-.gem-text{font-size:clamp(15px,1.35vw,22px);font-weight:900;white-space:nowrap;color:var(--ink)}
+.gem-card{padding:14px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-width:0}
+.teacher-gem-art{display:block;width:100%;max-width:120px;height:auto;filter:drop-shadow(0 0 9px var(--gem))}
+.teacher-gem-char{font-family:inherit;fill:#fff8e7;font-size:32px;font-weight:900;paint-order:stroke;stroke:#2d2853;stroke-width:2.5px}
+.gem-answer-count{font-size:clamp(12px,1.2vw,17px);font-weight:700;white-space:nowrap;color:var(--ink)}
 .dashboard-note{display:none}
-@media(max-width:1100px){.gem-dashboard{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:600px){.gem-dashboard{gap:4px}.gem-card{padding:10px 2px;border-radius:12px}.gem-answer-count{font-size:10px}}
