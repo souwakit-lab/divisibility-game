@@ -1,1 +1,6 @@
 .leaderboard-panel{margin-top:18px;padding:20px;border:1px solid var(--line);border-radius:20px;background:var(--panel)}.panel-title{display:flex;justify-content:space-between;gap:12px;align-items:baseline}.panel-title h2{margin:0;font-size:20px}.panel-title span{color:var(--muted);font-size:12px}.leaderboard-list{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:14px}.leader-row{display:grid;grid-template-columns:36px 1fr auto;align-items:center;gap:10px;padding:11px 13px;border-radius:11px;background:#10192e}.leader-row .rank{color:var(--gold);font-weight:900}.leader-row .name{font-weight:800}.leader-row small{display:block;color:#95a5c5;font-size:11px;font-weight:500}.leader-row .score{color:var(--green);font-weight:900}@media(max-width:550px){.leaderboard-list{grid-template-columns:1fr}}
+.summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.gem-card{display:block;width:100%;text-align:left;font:inherit;color:var(--ink);cursor:pointer;transition:transform .16s ease,box-shadow .16s ease}
+.gem-card:hover,.gem-card:focus-visible{transform:translateY(-3px);box-shadow:0 20px 48px #0007;outline:2px solid var(--gem)}
+.gem-hint{display:block;margin-top:15px;color:var(--muted);font-size:12px}
+.dashboard-note{display:none}

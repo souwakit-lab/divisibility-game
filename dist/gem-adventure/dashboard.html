@@ -13,19 +13,17 @@
   <main class="dashboard-shell">
     <header class="dashboard-header">
       <div><p class="eyebrow">LIVE CLASSROOM · GEM MONITOR</p><h1>七寶石守護者大屏</h1><p class="muted">SG1A／SG1B 學生答題後自動更新；點擊寶石查看名單。</p></div>
-      <div class="dashboard-actions"><select id="class-filter"><option value="">全班總覽</option></select><button class="toolbar-button" id="fullscreen-button">全螢幕</button></div>
+      <div class="dashboard-actions"><select id="class-filter"><option value="">全班總覽</option></select></div>
     </header>
     <section class="summary-grid">
       <article class="metric"><span>總參加人數</span><strong id="stat-players">0</strong></article>
-      <article class="metric"><span>已答對人次</span><strong id="stat-correct">0</strong></article>
-      <article class="metric"><span>總答題次數</span><strong id="stat-attempts">0</strong></article>
-      <article class="metric"><span>最後更新</span><strong id="updated-at">等待資料</strong></article>
+      <article class="metric"><span>資料狀態</span><strong id="updated-at">等待資料</strong></article>
     </section>
     <section class="gem-dashboard" id="gem-grid"></section>
     <section class="leaderboard-panel"><div class="panel-title"><h2>🏆 守護者排行榜</h2><span>已解鎖寶石數量 · 同數量以最先完成為先</span></div><div id="leaderboard" class="leaderboard-list"></div></section>
     <section class="dashboard-note">狀態說明：<b class="legend correct">已答對</b><b class="legend wrong">曾答錯</b><b class="legend pending">未答對</b>　答對後會從答錯名單中移除。</section>
   </main>
-  <div class="modal-backdrop" id="modal-backdrop" hidden><section class="roster-modal"><button class="close" id="close-modal">×</button><div id="modal-content"></div></section></div>
+  <div class="modal-backdrop" id="modal-backdrop" hidden><section class="roster-modal" role="dialog" aria-modal="true"><button class="close" id="close-modal" aria-label="關閉名單">×</button><div id="modal-content"></div></section></div>
   <script src="config.js"></script>
   <script src="gem-dashboard.js"></script>
 </body>
