@@ -12,7 +12,7 @@ const STUDENTS = Object.fromEntries(Object.entries(STUDENT_NAMES).map(([classNam
 const $ = (id) => document.getElementById(id); let latest = null;
 function init() {
   Object.keys(STUDENTS).forEach((cls) => $("class-filter").add(new Option(cls, cls)));
-  $("class-filter").addEventListener("change", refresh); $("fullscreen-button").addEventListener("click", () => document.documentElement.requestFullscreen?.()); $("close-modal").addEventListener("click", closeModal); $("modal-backdrop").addEventListener("click", (e) => { if (e.target.id === "modal-backdrop") closeModal(); });
+  $("class-filter").addEventListener("change", refresh); $("close-modal").addEventListener("click", closeModal); $("modal-backdrop").addEventListener("click", (e) => { if (e.target.id === "modal-backdrop") closeModal(); }); document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
   refresh(); window.setInterval(refresh, 6000); document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh(); });
 }
 async function refresh() {
@@ -31,8 +31,8 @@ function buildData(players, attempts) {
   return { players, attempts, gems };
 }
 function render(data) {
-  $("stat-players").textContent = data.players.length; $("stat-correct").textContent = data.gems.reduce((sum, g) => sum + g.correct.length, 0); $("stat-attempts").textContent = data.attempts.length; $("updated-at").textContent = new Date().toLocaleTimeString("zh-Hant", {hour:"2-digit", minute:"2-digit", second:"2-digit"});
-  $("gem-grid").innerHTML = data.gems.map((g, i) => `<article class="gem-card" style="--gem:${g.color}"><span class="gem-icon">💎</span><span class="count">${g.correct.length} / ${data.players.length}</span><h2>「${g.char}」${g.name}</h2><div class="bars"><div class="bar correct"><span>答對</span><strong>${g.correct.length}</strong></div><div class="bar wrong"><span>答錯</span><strong>${g.wrong.length}</strong></div><div class="bar pending"><span>未答對</span><strong>${g.pending.length}</strong></div></div><button data-gem="${i}">查看三類名單</button></article>`).join("");
+  $("stat-players").textContent = data.players.length; $("updated-at").textContent = new Date().toLocaleTimeString("zh-Hant", {hour:"2-digit", minute:"2-digit", second:"2-digit"});
+  $("gem-grid").innerHTML = data.gems.map((g, i) => `<button class="gem-card" style="--gem:${g.color}" data-gem="${i}" aria-label="查看「${g.char}」${g.name}名單"><span class="gem-icon">💎</span><span class="count">${g.correct.length} 人答對</span><h2>「${g.char}」${g.name}</h2><span class="gem-hint">點擊查看答對、答錯及未答對名單</span></button>`).join("");
   const ranking = [...data.players].sort((a, b) => b.unlocked.length - a.unlocked.length || String(a.lastCompletedAt || "9999").localeCompare(String(b.lastCompletedAt || "9999")) || String(a.name).localeCompare(String(b.name)));
   $("leaderboard").innerHTML = ranking.length ? ranking.map((p, i) => `<div class="leader-row"><span class="rank">${i + 1}</span><span class="name">${escapeHtml(p.name)}<small>${escapeHtml(p.className)} ${p.id}號</small></span><span class="score">${p.unlocked.length} 顆</span></div>`).join("") : '<div class="person">尚未有學生登入</div>';
   document.querySelectorAll("[data-gem]").forEach((button) => button.addEventListener("click", () => openModal(data.gems[Number(button.dataset.gem)])));
