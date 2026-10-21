@@ -4,7 +4,11 @@ const GEMS = [
   {char:"石", name:"加法之光", color:"#5abde8"}, {char:"排", name:"減法之光", color:"#a991ff"}, {char:"灣", name:"奇數之光", color:"#50d4bc"},
   {char:"公", name:"倍增之光", color:"#f4b75d"}, {char:"立", name:"縮小之光", color:"#f38fae"}, {char:"學", name:"三倍之光", color:"#72a8f6"}, {char:"校", name:"正負魔法", color:"#afd978"},
 ];
-const STUDENTS = Object.fromEntries(["SG1A","SG1B"].map((className) => [className, Object.fromEntries(Array.from({length:34}, (_, index) => index + 1).filter((id) => !(className === "SG1B" && id === 29)).map((id) => [id, `${className} ${id}號`]))]));
+const STUDENT_NAMES = {
+  SG1A: ["歐陽周政","歐芷菱","蔡銀杰","陳俊希","陳炯文","陳宇恆","陳柏豪","卓莉珊","莊超穎","鍾欣澄","馮子軒","黃鈞亮","林立","李振豪","李梓琪","李沁穎","李宇杰","梁依靜","梁羽盈","盧佩辰","黃夢琪","趙家美","歐陽浩賢","陳家莉","歐承澔","張子茵","徐希瑜","邢嘉豪","楊昊宇","邱嘉成","郭添滿","王思淇","黃鈺裕","黃健樺"],
+  SG1B: ["陳毅","曾蔚喬","鄭凱琳","陳思如","程家儀","張芯然","蔡朗然","董詩予","馮家宥","管梓皓","黎芷盈","劉德偉","李善婷","李雅琪","凌寶旋","吳靖怡","宋允曦","譚梓軒","譚詩敏","袁渟欣","曾凱龍","鄭家林","張昊臻","何家浩","陳梓峰","林灝晴","林文軒","梁王恩",null,"盧家豪","勞允睿","勞允堤","黃曉樂","王敬興"],
+};
+const STUDENTS = Object.fromEntries(Object.entries(STUDENT_NAMES).map(([className, names]) => [className, Object.fromEntries(names.map((name, index) => [index + 1, name]).filter(([, name]) => name))]));
 const $ = (id) => document.getElementById(id); let latest = null;
 function init() {
   Object.keys(STUDENTS).forEach((cls) => $("class-filter").add(new Option(cls, cls)));
