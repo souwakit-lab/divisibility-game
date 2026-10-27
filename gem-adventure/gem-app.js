@@ -8,6 +8,8 @@ const STUDENT_NAMES = {
 const STUDENTS = Object.fromEntries(Object.entries(STUDENT_NAMES).map(([className, names]) => [className, Object.fromEntries(names.map((name, index) => [index + 1, name]).filter(([, name]) => name))]));
 const $ = (id) => document.getElementById(id);
 let current = null;
+let progressSync = false;
+let uploadPromise = null;
 
 function init() {
   Object.keys(STUDENTS).forEach((cls) => $("class-select").add(new Option(cls, cls)));
@@ -17,6 +19,8 @@ function init() {
   $("logout-button").addEventListener("click", () => location.reload());
   $("game-iframe").addEventListener("load", attachGameListener);
   updatePreview();
+  window.addEventListener("online", () => { if (current) syncLoginProgress(current); });
+  window.setInterval(() => { if (current) syncLoginProgress(current); }, 30000);
 }
 function updatePreview() {
   const cls = $("class-select").value, previous = Number($("id-select").value) || 1;
@@ -45,23 +49,27 @@ async function login() {
   }
 }
 async function syncLoginProgress(student) {
-  if (!API_URL) return;
+  if (!API_URL || progressSync) return;
+  progressSync = true;
   $("sync-status").textContent = "正在同步進度…";
   try {
+    await flushPendingAttempts();
+    const requestedAt = Date.now();
     const remote = await fetchJson(`${API_URL}?action=loadGemPlayer&className=${encodeURIComponent(student.className)}&id=${student.id}&name=${encodeURIComponent(student.name)}`);
     if (!Array.isArray(remote?.progress?.unlocked)) throw new Error("Invalid progress response");
     if (current !== student) return;
-    student.unlocked = [...new Set([...remote.progress.unlocked, ...student.sessionUnlocked])];
+    const pendingCorrect = readDb().attempts.filter(a => a.className === student.className && Number(a.id) === student.id && (!a.synced || Date.parse(a.timestamp) >= requestedAt) && a.isCorrect).map(a => a.gemIndex);
+    student.unlocked = [...new Set([...remote.progress.unlocked, ...pendingCorrect])];
     const db = readDb();
     db.players[`${student.className}-${student.id}`] = {className:student.className,id:student.id,name:student.name,unlocked:student.unlocked};
     localStorage.setItem(LOCAL_KEY, JSON.stringify(db));
     localStorage.setItem(GAME_KEY, JSON.stringify(student.unlocked));
     $("game-iframe").contentWindow.applyClassroomProgress?.(student.unlocked);
-    $("sync-status").textContent = "";
+    $("sync-status").textContent = pendingCorrect.length ? "正在傳送答題紀錄…" : "已連線";
   } catch (error) {
     console.warn("進度同步失敗", error);
     if (current === student) $("sync-status").textContent = "暫用本機進度，雲端尚未連線";
-  }
+  } finally { progressSync = false; }
 }
 function attachGameListener() {
   const frame = $("game-iframe"), doc = frame.contentDocument;
@@ -91,11 +99,31 @@ async function sendAttempt(payload) {
     if (!current.unlocked.includes(payload.gemIndex)) current.unlocked.push(payload.gemIndex);
   }
   saveLocalAttempt(payload);
+  $("sync-status").textContent = "正在傳送答題紀錄…";
   try {
-    if (API_URL) { const response = await fetch(API_URL, { method:"POST", headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8"}, body:`action=saveGem&data=${encodeURIComponent(JSON.stringify(payload))}` }); const result = await response.json(); if (!result.ok) throw new Error(result.error || "remote save failed"); }
-  } catch (error) { console.warn("資料尚未送出，已保留本機紀錄", error); saveLocalAttempt(payload); }
+    if (!API_URL) throw new Error("Missing API URL");
+    await flushPendingAttempts();
+    $("sync-status").textContent = "已同步";
+  } catch (error) { console.warn("資料尚未送出，已保留本機紀錄", error); $("sync-status").textContent = "答題已保存在本機，連線後自動補傳"; }
 }
-async function fetchJson(url) { const response = await fetch(url, { cache:"no-store", signal:AbortSignal.timeout(15000) }); if (!response.ok) throw new Error("request failed"); return response.json(); }
+function flushPendingAttempts() {
+  if (uploadPromise) return uploadPromise;
+  uploadPromise = (async () => {
+    while (current) {
+      const batch = readDb().attempts.filter(a => a.className === current.className && Number(a.id) === current.id && !a.synced).slice(0, 20);
+      if (!batch.length) return;
+      const response = await fetch(API_URL, {method:"POST", signal:AbortSignal.timeout(45000), headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8"}, body:new URLSearchParams({action:"syncGemAttempts", data:JSON.stringify({attempts:batch})}).toString()});
+      if (!response.ok) throw new Error("Upload failed");
+      const result = await response.json();
+      if (!result.ok || !Array.isArray(result.received) || !batch.every(a => result.received.includes(a.attemptId))) throw new Error("Missing upload confirmation");
+      const db = readDb(), received = new Set(result.received);
+      db.attempts.forEach(a => { if (received.has(a.attemptId)) a.synced = true; });
+      localStorage.setItem(LOCAL_KEY, JSON.stringify(db));
+    }
+  })().finally(() => { uploadPromise = null; });
+  return uploadPromise;
+}
+async function fetchJson(url) { const response = await fetch(url, { cache:"no-store", signal:AbortSignal.timeout(45000) }); if (!response.ok) throw new Error("request failed"); return response.json(); }
 function emptyDb() { return { players:{}, attempts:[] }; }
 function readDb() { try { return JSON.parse(localStorage.getItem(LOCAL_KEY)) || emptyDb(); } catch { return emptyDb(); } }
 function loadLocal(className, id, name) {
@@ -108,7 +136,7 @@ function saveLocalAttempt(payload) {
   const db = readDb(), key = `${payload.className}-${payload.id}`;
   const player = db.players[key] || { className:payload.className, id:payload.id, name:payload.name, unlocked:[] };
   if (payload.isCorrect && !player.unlocked.includes(payload.gemIndex)) player.unlocked.push(payload.gemIndex);
-  if (!db.attempts.some((item) => item.attemptId === payload.attemptId)) db.attempts.push({...payload, timestamp:new Date().toISOString()});
+  if (!db.attempts.some((item) => item.attemptId === payload.attemptId)) db.attempts.push({...payload, timestamp:payload.timestamp || new Date().toISOString(), synced:false});
   db.players[key] = player; localStorage.setItem(LOCAL_KEY, JSON.stringify(db));
 }
 document.addEventListener("DOMContentLoaded", init);

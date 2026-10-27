@@ -16,7 +16,7 @@ function init() {
   refresh(); window.setInterval(refresh, 6000); document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh(); });
 }
 async function refresh() {
-  try { const remote = API_URL ? await (await fetch(`${API_URL}?action=getGemDashboardData&className=${encodeURIComponent($("class-filter").value)}&t=${Date.now()}`)).json() : null; latest = remote?.gems ? remote : localData($("class-filter").value); render(latest); } catch (error) { console.error(error); latest = localData($("class-filter").value); render(latest); $("updated-at").textContent = "本機備援"; }
+  try { const remote = API_URL ? await (await fetch(`${API_URL}?action=getGemDashboardData&className=${encodeURIComponent($("class-filter").value)}&t=${Date.now()}`)).json() : null; if (API_URL && !Array.isArray(remote?.gems)) throw new Error("Cloud dashboard unavailable"); latest = remote || localData($("class-filter").value); render(latest); } catch (error) { console.error(error); latest = localData($("class-filter").value); render(latest); $("updated-at").textContent = "雲端未連線（本機備援）"; }
 }
 function localData(className) {
   let db; try { db = JSON.parse(localStorage.getItem(LOCAL_KEY)) || {players:{},attempts:[]}; } catch { db={players:{},attempts:[]}; }
@@ -54,7 +54,7 @@ async function resetData() {
       const result = await response.json(); if (!result.ok) throw new Error(result.error || "remote reset failed");
     }
     resetLocalData(className); await refresh();
-  } catch (error) { console.error(error); resetLocalData(className); await refresh(); $("updated-at").textContent = "已重置本機資料"; }
+  } catch (error) { console.error(error); $("updated-at").textContent = "雲端重置未確認，請稍後重試"; }
   button.disabled = false; button.textContent = "重置數據";
 }
 function resetLocalData(className) {

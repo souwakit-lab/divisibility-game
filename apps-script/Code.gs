@@ -142,7 +142,15 @@ function doPost(e) {
     if (action === "saveGem") {
       validateGemPayload_(payload);
       saveGemAttempt_(spreadsheet_(), payload);
-      return jsonResponse({ ok: true });
+      return jsonResponse({ ok: true, attemptId: String(payload.attemptId) });
+    }
+    if (action === "syncGemAttempts") {
+      const attempts = payload.attempts;
+      if (!Array.isArray(attempts) || attempts.length > 20) throw new Error("Invalid batch");
+      attempts.forEach(validateGemPayload_);
+      const spreadsheet = spreadsheet_();
+      attempts.forEach((attempt) => saveGemAttempt_(spreadsheet, attempt));
+      return jsonResponse({ ok:true, received:attempts.map((attempt) => String(attempt.attemptId)) });
     }
     if (action === "resetGem") {
       const className = String(payload.className || "");
@@ -1093,6 +1101,8 @@ function validateGemPayload_(payload) {
 }
 
 function resetGemData_(spreadsheet, className) {
+  const resetAt = new Date().toISOString();
+  (className ? [className] : GEM_CLASSES).forEach((cls) => PropertiesService.getScriptProperties().setProperty(`gem-reset:${cls}`, resetAt));
   const sheets = ensureGemSheets_(spreadsheet);
   const targets = [
     { sheet: sheets.player, classColumn: 0 },
@@ -1110,11 +1120,15 @@ function resetGemData_(spreadsheet, className) {
 
 function loadGemPlayer_(className, studentId, name) {
   if (!GEM_CLASSES.includes(String(className))) throw new Error("Invalid class");
+  const lock = LockService.getScriptLock(); lock.waitLock(15000);
+  try {
   const sheets = ensureGemSheets_(spreadsheet_());
   const id = Number(studentId);
+  if (!Number.isInteger(id) || id < 1 || id > 34 || (className === "SG1B" && id === 29)) throw new Error("Invalid student id");
   let row = dataRows_(sheets.player, 5).find((item) => item[0] === className && Number(item[1]) === id);
   if (!row && name) { sheets.player.appendRow([className, id, safeText_(name, 30), "[]", new Date()]); row = [className, id, safeText_(name, 30), "[]", new Date()]; }
   return { progress: { unlocked: row ? gemUnlocked_(row[3]) : [] }, player: row ? { className: row[0], id:Number(row[1]), name:row[2] } : null };
+  } finally { lock.releaseLock(); }
 }
 
 function getGemDashboardData_(className) {
@@ -1144,6 +1158,10 @@ function gemUnlocked_(value) {
 }
 
 function saveGemAttempt_(spreadsheet, payload) {
+  const submittedAt = new Date(payload.timestamp || new Date());
+  if (!Number.isFinite(submittedAt.getTime()) || submittedAt.getTime() > Date.now() + 300000) throw new Error("Invalid timestamp");
+  const resetAt = PropertiesService.getScriptProperties().getProperty(`gem-reset:${payload.className}`);
+  if (resetAt && submittedAt.getTime() <= Date.parse(resetAt)) return;
   const sheets = ensureGemSheets_(spreadsheet);
   const attemptRows = dataRows_(sheets.answer, 7);
   if (attemptRows.some((row) => String(row[6]) === String(payload.attemptId))) return;
@@ -1153,7 +1171,7 @@ function saveGemAttempt_(spreadsheet, payload) {
   if (payload.isCorrect && !unlocked.includes(Number(payload.gemIndex))) unlocked.push(Number(payload.gemIndex));
   const playerValues = [[safeText_(payload.className, 12), Number(payload.id), safeText_(payload.name, 30), JSON.stringify(unlocked.sort((a, b) => a - b)), new Date()]];
   if (index >= 0) sheets.player.getRange(index + 2, 1, 1, 5).setValues(playerValues); else sheets.player.getRange(sheets.player.getLastRow() + 1, 1, 1, 5).setValues(playerValues);
-  sheets.answer.getRange(sheets.answer.getLastRow() + 1, 1, 1, 7).setValues([[new Date(), safeText_(payload.className, 12), Number(payload.id), safeText_(payload.name, 30), Number(payload.gemIndex), payload.isCorrect ? "是" : "否", safeText_(payload.attemptId, 120)]]);
+  sheets.answer.getRange(sheets.answer.getLastRow() + 1, 1, 1, 7).setValues([[submittedAt, safeText_(payload.className, 12), Number(payload.id), safeText_(payload.name, 30), Number(payload.gemIndex), payload.isCorrect ? "是" : "否", safeText_(payload.attemptId, 120)]]);
   SpreadsheetApp.flush();
 }
 
