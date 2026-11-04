@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-04T02:31:45.487Z",
+  "updatedAt": "2026-11-04T02:33:45.558Z",
   "students": [
     {
       "id": "9f7cd40f-9ea2-45a1-80fb-66d18c8cdb0c",
@@ -405,5 +405,46 @@
       "name": "王敬興"
     }
   ],
-  "records": []
+  "records": [
+    {
+      "id": "647db8e7-68a8-4337-847b-f289d2f63403",
+      "studentId": "a428c0cc-e534-45d3-b083-8150bc9b75eb",
+      "delta": -1,
+      "reason": "上課不專心",
+      "time": "2026-11-04T02:33:44.753Z",
+      "batchId": "412812e8-5531-42ae-86a7-423fc5140fd1"
+    },
+    {
+      "id": "54f3d26d-c637-40d6-9728-d1737eed711b",
+      "studentId": "f186b6dd-cd9d-4b8f-b105-f11f3ea3efed",
+      "delta": -1,
+      "reason": "上課不專心",
+      "time": "2026-11-04T02:33:44.753Z",
+      "batchId": "412812e8-5531-42ae-86a7-423fc5140fd1"
+    },
+    {
+      "id": "949900ff-a9f3-4a43-a3fb-e7e7b8ebe51b",
+      "studentId": "96807267-2e74-4bb9-9ee9-ed3eea8db08d",
+      "delta": -1,
+      "reason": "上課不專心",
+      "time": "2026-11-04T02:33:44.753Z",
+      "batchId": "412812e8-5531-42ae-86a7-423fc5140fd1"
+    },
+    {
+      "id": "543de10e-e1e3-4b80-86e0-95820ce9a86c",
+      "studentId": "6d98e283-1451-4ae2-b4d4-da6008af4844",
+      "delta": -1,
+      "reason": "上課不專心",
+      "time": "2026-11-04T02:33:44.753Z",
+      "batchId": "412812e8-5531-42ae-86a7-423fc5140fd1"
+    },
+    {
+      "id": "ec400a8d-8dd5-4292-bc23-e6bfb8589a4c",
+      "studentId": "c293292b-7df9-4eac-b7ff-b08767473fe1",
+      "delta": -1,
+      "reason": "上課不專心",
+      "time": "2026-11-04T02:33:44.753Z",
+      "batchId": "412812e8-5531-42ae-86a7-423fc5140fd1"
+    }
+  ]
 }
