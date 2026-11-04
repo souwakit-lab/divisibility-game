@@ -43,6 +43,7 @@
     <p>班級積分系統 · 教師登入</p>
     <label class="field-label" for="loginPassword">登入密碼</label>
     <input id="loginPassword" class="field" type="password" autocomplete="current-password" required autofocus>
+    <label class="check-wrap" style="margin-top:12px;justify-content:center"><input id="rememberLogin" type="checkbox" checked> 在此瀏覽器保持登入 30 天</label>
     <button class="btn btn-gold" type="submit">登入系統</button>
     <div id="loginError" class="login-error" role="alert" aria-live="polite"></div>
   </form>
@@ -96,18 +97,15 @@
           <button class="btn btn-pale" id="exportRecords">積分紀錄 CSV</button>
         </div>
         <div class="sync-box">
-          <h2 class="panel-heading" style="margin-bottom:8px">☁️ GitHub 自動同步</h2>
-          <label class="field-label" for="githubToken">GitHub Token</label>
-          <input id="githubToken" class="field" type="password" autocomplete="off" placeholder="ghp_… 或 github_pat_…">
-          <label class="check-wrap" style="margin-top:9px"><input id="githubRememberToken" type="checkbox"> 在此瀏覽器記住 Token</label>
-          <div class="mini-pair" style="margin-top:9px"><button class="btn btn-pale" id="githubSaveToken">儲存 Token</button><button class="btn btn-pale" id="githubClearToken">清除 Token</button></div>
-          <div class="mini-pair" style="margin-top:9px"><button class="btn btn-green" id="githubSyncNow">立即同步</button><button class="btn btn-pale" id="githubLoadNow">從 GitHub 載入</button></div>
-          <p id="githubStatus" class="sync-status">未設定同步 Token。</p>
-          <p class="tiny-note">Token 只保存在目前瀏覽器工作階段；請使用 Fine-grained Token，僅授權此 repo 的 Contents 讀寫權限。</p>
+          <h2 class="panel-heading" style="margin-bottom:8px">☁️ Google 雲端同步</h2>
+          <p class="tiny-note">登入後自動載入名單及分數。加扣分會自動保存，其他裝置約每 15 秒更新。</p>
+          <div class="mini-pair" style="margin-top:9px"><button class="btn btn-green" id="cloudSyncNow">立即同步</button><button class="btn btn-pale" id="cloudLoadNow">載入雲端</button></div>
+          <p id="cloudStatus" class="sync-status" role="status" aria-live="polite">連接 Google 雲端中…</p>
+          <button class="btn btn-pale btn-block" id="cloudLogout" style="margin-top:9px">登出</button>
         </div>
         <div class="separator"></div>
         <button class="btn btn-block" id="clearData" style="color:#a45a52;background:#fff0eb;border:1px solid #efd1ca">🗑 清空所有資料</button>
-        <p class="tiny-note"><strong>保存方式：</strong>資料只保存在目前瀏覽器，關閉頁面仍可保留；不會自動同步到其他裝置。請定期下載 JSON 備份。</p>
+        <p class="tiny-note"><strong>保存方式：</strong>Google 試算表保存共用名單和積分；本機保留離線備份，連線後自動補傳。請等候「已保存到 Google」再關閉頁面。</p>
       </section>
     </aside>
     <main class="content">
@@ -126,18 +124,15 @@
 </div>
 <div id="scoreBackdrop" class="modal-backdrop hidden" role="presentation"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="scoreTitle"><h3 id="scoreTitle">🖋️ 記錄積分</h3><small id="scoreTargets">已選擇 1 位學生</small><div class="operations"><button class="operation active plus" id="opPlus" type="button">＋ 加分</button><button class="operation minus" id="opMinus" type="button">－ 扣分</button></div><label for="pointAmount" class="field-label">分數（每位學生）</label><input id="pointAmount" class="field" type="number" inputmode="numeric" min="1" max="100" value="1"><label for="reasonPreset" class="field-label">常用原因（可選）</label><select id="reasonPreset" class="field"><option value="">請選擇加分原因（可留空）</option></select><label for="pointReason" class="field-label">補充原因（可留空）</label><textarea id="pointReason" class="field" maxlength="200" placeholder="例如：主動解答數學問題（選填）"></textarea><p class="modal-note">會自動記錄現在的日期和時間；批量記分會逐位建立紀錄。</p><div class="modal-actions"><button class="btn btn-pale" id="cancelScore">取消</button><button class="btn btn-green" id="confirmScore">確認加分</button></div></div></div>
 <div id="toast" role="status" aria-live="polite"></div>
+<script src="cloud-sync.js?v=20261104"></script>
 <script>
 (()=>{
   'use strict';
   const KEY='keju_class_points_v1';
   const CLASS_KEY='keju_class_points_active_class_v1';
-  const AUTH_KEY='keju_class_points_auth_v1';
-  const GITHUB_TOKEN_KEY='keju_class_points_github_token_v1';
-  const GITHUB_REMEMBER_KEY='keju_class_points_github_remember_v1';
-  const GITHUB_REPO='souwakit-lab/divisibility-game';
-  const GITHUB_BRANCH='gh-pages';
-  const GITHUB_PATH='jinbang/data/points.json';
-  const PASSWORD_SHA256='f4c05f3b344fdb78cb00286deb76e8b072c92fd66cbf828c0602984201373784';
+  const AUTH_KEY='keju_class_points_google_session_v2';
+  const CLOUD_META_KEY='keju_class_points_google_sync_v2';
+  const API_URL='https://script.google.com/macros/s/AKfycbxSTZ1HgFexPUhqhPJxwvVynAHVTgkenz99--21PEi2GKPs6beia2TMgAY3KirvSlQgnA/exec';
   const LEVELS=[
     ['啟蒙書童','初入書院，展開求學之旅。'],
     ['勤學童生','勤讀詩書，養成好習慣。'],
@@ -170,18 +165,13 @@
   function getStats(){const map=new Map(state.students.map(s=>[s.id,{plus:0,minus:0,net:0}]));for(const r of state.records){const x=map.get(r.studentId);if(!x)continue;const d=Number(r.delta)||0; if(d>0)x.plus+=d;else x.minus+=Math.abs(d);x.net+=d;}return map;}
   function visibleStudents(){let arr=state.students.filter(s=>activeClass==='all'||s.className===activeClass);if(searchText){const q=searchText.toLowerCase();arr=arr.filter(s=>(s.name+' '+s.number+' '+s.className).toLowerCase().includes(q));}const map=getStats();const compareNo=(a,b)=>String(a.number).localeCompare(String(b.number),'zh-Hant',{numeric:true});arr.sort((a,b)=>sortBy==='score'?(map.get(b.id).net-map.get(a.id).net || compareNo(a,b)):sortBy==='name'?(a.name.localeCompare(b.name,'zh-Hant') || compareNo(a,b)):(a.className.localeCompare(b.className,'zh-Hant',{numeric:true})||compareNo(a,b)));return arr;}
   function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),3100);}
-  let githubFileSha=null,githubSyncTimer=null,githubSyncBusy=false;
-  const githubToken=()=>{try{return sessionStorage.getItem(GITHUB_TOKEN_KEY)||localStorage.getItem(GITHUB_TOKEN_KEY)||'';}catch(e){return '';}};
-  function setSyncStatus(msg,kind=''){const el=$('githubStatus');if(!el)return;el.textContent=msg;el.className='sync-status '+(kind?'sync-'+kind:'');}
-  function persist(){try{localStorage.setItem(KEY,JSON.stringify({version:1,...state}));queueGithubSync();return true;}catch(e){toast('儲存失敗：瀏覽器空間不足，請立即匯出備份。');return false;}}
-  function toBase64(text){const bytes=new TextEncoder().encode(text);let binary='';for(let i=0;i<bytes.length;i+=0x8000)binary+=String.fromCharCode(...bytes.subarray(i,i+0x8000));return btoa(binary);}
-  function fromBase64(value){const binary=atob(value.replace(/\n/g,'')),bytes=Uint8Array.from(binary,c=>c.charCodeAt(0));return new TextDecoder().decode(bytes);}
-  function githubUrl(ref=''){const base=`https://api.github.com/repos/${GITHUB_REPO}/contents/${GITHUB_PATH}`;return ref?`${base}?ref=${encodeURIComponent(ref)}`:base;}
-  async function githubRequest(options={}){const token=githubToken();if(!token)throw Error('請先儲存 GitHub Token。');const {url=githubUrl(),...requestOptions}=options;const response=await fetch(url,{...requestOptions,headers:{Accept:'application/vnd.github+json',Authorization:`Bearer ${token}`,'X-GitHub-Api-Version':'2022-11-28',...(requestOptions.headers||{})}});if(!response.ok){let detail='';try{const body=await response.json();detail=body.message||'';}catch(e){}throw Error(`GitHub ${response.status}${detail?`：${detail}`:''}`);}return response.json();}
-  async function readGithubFile(){return githubRequest({method:'GET',url:githubUrl(GITHUB_BRANCH),headers:{}});}
-  async function syncGithub(){if(githubSyncBusy||!githubToken())return;githubSyncBusy=true;setSyncStatus('同步中…');try{if(!githubFileSha){try{const existing=await readGithubFile();githubFileSha=existing.sha||null;}catch(e){if(!String(e.message).startsWith('GitHub 404'))throw e;}}const payload=JSON.stringify({version:1,updatedAt:new Date().toISOString(),students:state.students,records:state.records},null,2);const body={message:'Sync class points data',content:toBase64(payload),branch:GITHUB_BRANCH};if(githubFileSha)body.sha=githubFileSha;const result=await githubRequest({method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});githubFileSha=result.content?.sha||githubFileSha;setSyncStatus(`已同步 ${new Date().toLocaleTimeString('zh-Hant',{hour12:false})}`,'ok');}catch(e){setSyncStatus(e.message||'同步失敗','error');}finally{githubSyncBusy=false;}}
-  function queueGithubSync(){if(!githubToken())return;clearTimeout(githubSyncTimer);githubSyncTimer=setTimeout(syncGithub,800);}
-  async function loadGithub(){if(!githubToken()){setSyncStatus('未設定同步 Token。','error');return;}setSyncStatus('讀取 GitHub 資料中…');try{const result=await readGithubFile();githubFileSha=result.sha||null;const remote=JSON.parse(fromBase64(result.content||''));if(!Array.isArray(remote.students)||!Array.isArray(remote.records))throw Error('GitHub 資料格式無效。');state={students:remote.students,records:remote.records};persistLocalOnly();renderAll();setSyncStatus(`已從 GitHub 載入 ${remote.students.length} 位學生`,'ok');}catch(e){if(String(e.message).startsWith('GitHub 404'))setSyncStatus('GitHub 尚未有資料，按「立即同步」建立。','ok');else setSyncStatus(e.message||'載入失敗','error');}}
+  function session(){try{return JSON.parse(sessionStorage.getItem(AUTH_KEY)||localStorage.getItem(AUTH_KEY)||'null');}catch(e){return null;}}
+  function setSyncStatus(msg,kind=''){const el=$('cloudStatus');el.textContent=msg;el.className='sync-status '+(kind?'sync-'+kind:'');}
+  const cloud=new JinbangCloud.CloudSync({url:API_URL,key:CLOUD_META_KEY,storage:localStorage,fetch:window.fetch.bind(window),uuid:uid,
+    token:()=>session()?.token||'',getState:()=>state,
+    setState:value=>{state={students:value.students,records:value.records};if(!persistLocalOnly())throw Error('本機儲存空間不足，請立即匯出備份。');renderAll();},
+    status:setSyncStatus,onAuthExpired:()=>{document.getElementById('login-screen').classList.remove('hidden');document.querySelector('.site').classList.add('hidden');$('loginError').textContent='登入已過期，請重新輸入密碼。';}});
+  function persist(replace=false){if(!persistLocalOnly()){toast('儲存失敗：瀏覽器空間不足，請立即匯出備份。');return false;}if(replace)cloud.markReplace();else cloud.queue();return true;}
   function persistLocalOnly(){try{localStorage.setItem(KEY,JSON.stringify({version:1,...state}));return true;}catch(e){return false;}}
   function init(){try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s&&Array.isArray(s.students)&&Array.isArray(s.records)){state={students:s.students,records:s.records};}activeClass=localStorage.getItem(CLASS_KEY)||'all';}catch(e){toast('讀取舊紀錄失敗，請嘗試匯入備份。');}updateClassOptions();renderLevels();renderAll();}
   function updateClassOptions(){
@@ -341,11 +331,10 @@
     else if(/\.xls$/i.test(file.name)){const library=await ensureXLSX();book=library.read(data,{type:'array'});}
     else throw Error('請選擇 .xlsx、.xls 或 .csv 名單檔案。');
     const parsed=parseWorkbook(book);if(!parsed.students.length){alert('沒有找到可匯入的學生。\n'+parsed.errors.join('\n')+'\n請確認文件有「學號」「姓名」標題。');return;}let added=0,updated=0;const unique=new Map(state.students.map(s=>[s.className+'\u0000'+s.number,s]));for(const s of parsed.students){const key=s.className+'\u0000'+s.number,existing=unique.get(key);if(existing){if(existing.name!==s.name){existing.name=s.name;updated++;}}else{const obj={id:uid(),className:s.className,number:s.number,name:s.name};state.students.push(obj);unique.set(key,obj);added++;}}persist();updateClassOptions();renderAll();toast(`Excel 匯入完成：新增 ${added} 位，更新姓名 ${updated} 位，原有積分保留。`);if(parsed.errors.length)alert('以下工作表未匯入：\n'+parsed.errors.join('\n'));}catch(err){console.error(err);alert('讀取 Excel 失敗：'+(err&&err.message||'不明原因'));}}
-  async function restoreBackup(file){if(!file)return;try{const data=JSON.parse(await file.text());if(!data||!Array.isArray(data.students)||!Array.isArray(data.records))throw Error('不是金榜學堂的備份格式');const students=data.students.map(s=>({id:String(s.id),className:String(s.className),number:String(s.number),name:String(s.name)}));if(students.some(s=>!s.id||!s.name||!s.number||!s.className||s.name.length>70))throw Error('名單格式無效');const ids=new Set(students.map(s=>s.id));if(ids.size!==students.length)throw Error('存在重複的學生識別碼');const records=data.records.map(r=>({id:String(r.id),studentId:String(r.studentId),delta:Number(r.delta),reason:String(r.reason||'').slice(0,200),time:String(r.time),batchId:String(r.batchId||'')}));if(records.some(r=>!ids.has(r.studentId)||!Number.isSafeInteger(r.delta)||r.delta===0||Math.abs(r.delta)>100||Number.isNaN(Date.parse(r.time))))throw Error('積分紀錄格式無效');if(!confirm(`將以備份取代目前所有資料：${students.length} 位學生、${records.length} 筆紀錄。此動作無法復原，確定繼續？`))return;state={students,records};selected.clear();activeClass='all';try{localStorage.removeItem(CLASS_KEY);}catch(e){}persist();renderAll();toast('備份還原成功。');}catch(err){alert('無法還原備份：'+err.message);}}
+  async function restoreBackup(file){if(!file)return;try{const data=JSON.parse(await file.text());if(!data||!Array.isArray(data.students)||!Array.isArray(data.records))throw Error('不是金榜學堂的備份格式');const students=data.students.map(s=>({id:String(s.id),className:String(s.className),number:String(s.number),name:String(s.name)}));if(students.some(s=>!s.id||!s.name||!s.number||!s.className||s.name.length>70))throw Error('名單格式無效');const ids=new Set(students.map(s=>s.id));if(ids.size!==students.length)throw Error('存在重複的學生識別碼');const records=data.records.map(r=>({id:String(r.id),studentId:String(r.studentId),delta:Number(r.delta),reason:String(r.reason||'').slice(0,200),time:String(r.time),batchId:String(r.batchId||'')}));if(records.some(r=>!ids.has(r.studentId)||!Number.isSafeInteger(r.delta)||r.delta===0||Math.abs(r.delta)>100||Number.isNaN(Date.parse(r.time))))throw Error('積分紀錄格式無效');if(!confirm(`將以備份取代本機及 Google 雲端的所有資料：${students.length} 位學生、${records.length} 筆紀錄。其他裝置也會更新，確定繼續？`))return;state={students,records};selected.clear();activeClass='all';try{localStorage.removeItem(CLASS_KEY);}catch(e){}persist(true);renderAll();toast('本機備份已還原，正在同步 Google 雲端。');}catch(err){alert('無法還原備份：'+err.message);}}
   function seedDemo(){if(state.students.length)return;const data=[['示範甲班','01','陳小明',33,4],['示範甲班','02','林樂樂',18,2],['示範甲班','03','張思琪',56,1],['示範甲班','04','何嘉欣',13,9],['示範甲班','05','李子軒',72,5],['示範乙班','01','吳星星',15,3],['示範乙班','02','黃欣悅',84,0],['示範乙班','03','周小禾',9,0]];for(const [className,number,name,plus,minus] of data){const id=uid();state.students.push({id,className,number,name});if(plus)state.records.push({id:uid(),studentId:id,delta:plus,reason:'示範加分',time:new Date().toISOString(),batchId:'demo'});if(minus)state.records.push({id:uid(),studentId:id,delta:-minus,reason:'示範扣分',time:new Date().toISOString(),batchId:'demo'});}persist();renderAll();toast('已載入虛構示範名單；正式使用前可清空。');}
-  async function hashPassword(value){const bytes=new TextEncoder().encode(value),digest=await crypto.subtle.digest('SHA-256',bytes);return [...new Uint8Array(digest)].map(b=>b.toString(16).padStart(2,'0')).join('');}
   function showApp(){document.getElementById('login-screen').classList.add('hidden');document.querySelector('.site').classList.remove('hidden');init();}
-  async function login(e){e.preventDefault();const input=$('loginPassword'),error=$('loginError');error.textContent='';try{if(await hashPassword(input.value)!==PASSWORD_SHA256){error.textContent='密碼不正確，請再試一次。';input.select();return;}try{sessionStorage.setItem(AUTH_KEY,'1');}catch(err){}showApp();}catch(err){error.textContent='此瀏覽器不支援安全登入，請更新後再試。';}}
+  async function login(e){e.preventDefault();const input=$('loginPassword'),error=$('loginError'),button=$('loginForm').querySelector('button');error.textContent='正在登入 Google 雲端…';button.disabled=true;try{const result=await cloud.request('jinbangLogin',{password:input.value});const value=JSON.stringify({token:result.token,expires:result.expires});sessionStorage.removeItem(AUTH_KEY);localStorage.removeItem(AUTH_KEY);($('rememberLogin').checked?localStorage:sessionStorage).setItem(AUTH_KEY,value);input.value='';cloud.blocked=false;showApp();await cloud.start(result.snapshot);error.textContent='';}catch(err){error.textContent=err.message||'暫時無法連接 Google，請稍後重試。';}finally{button.disabled=false;}}
   $('loginForm').addEventListener('submit',login);
   document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
   document.querySelectorAll('[data-rank]').forEach(b=>b.addEventListener('click',()=>{rankType=b.dataset.rank;renderRank();}));
@@ -357,7 +346,7 @@
   $('excelImportBtn').addEventListener('click',()=>$('excelInput').click());$('excelInput').addEventListener('change',async e=>{await importExcel(e.target.files[0]);e.target.value='';});
   $('restoreBtn').addEventListener('click',()=>$('restoreInput').click());$('restoreInput').addEventListener('change',async e=>{await restoreBackup(e.target.files[0]);e.target.value='';});
   $('exportBackup').addEventListener('click',backup);$('exportSummary').addEventListener('click',summaryExport);$('exportRecords').addEventListener('click',recordsExport);
-  $('clearData').addEventListener('click',()=>{if(!state.students.length&&!state.records.length){toast('目前沒有需要清空的資料。');return;}if(!confirm('確定刪除所有班別、學生及記分紀錄？\n建議先匯出 JSON 備份！'))return;if(!confirm('最後確認：這將永久清空此瀏覽器的所有積分資料。'))return;state={students:[],records:[]};selected.clear();activeClass='all';try{localStorage.removeItem(CLASS_KEY);}catch(e){}persist();renderAll();switchTab('students');toast('已清空所有資料。');});
+  $('clearData').addEventListener('click',()=>{if(!state.students.length&&!state.records.length){toast('目前沒有需要清空的資料。');return;}if(!confirm('確定刪除所有班別、學生及記分紀錄？\n這會同步清空 Google 雲端及其他裝置的資料，請先匯出 JSON 備份！'))return;if(!confirm('最後確認：保存成功後，所有裝置都會使用清空後的資料。'))return;state={students:[],records:[]};selected.clear();activeClass='all';try{localStorage.removeItem(CLASS_KEY);}catch(e){}persist(true);renderAll();switchTab('students');toast('本機已清空，正在同步 Google 雲端。');});
   $('demoBtn').addEventListener('click',seedDemo);
   $('studentGrid').addEventListener('click',e=>{const quick=e.target.closest('[data-quick]');if(quick){recordPoints([quick.dataset.id],Number(quick.dataset.quick),'');return;}const custom=e.target.closest('[data-custom]');if(custom)openModal([custom.dataset.custom],1);});
   $('studentGrid').addEventListener('change',e=>{if(e.target.matches('[data-select]')){const id=e.target.dataset.select;if(e.target.checked)selected.add(id);else selected.delete(id);const card=e.target.closest('.student-card');if(card)card.classList.toggle('selected',e.target.checked);renderSelectionBar();}});
@@ -368,11 +357,14 @@
   $('confirmScore').addEventListener('click',confirmScore);$('cancelScore').addEventListener('click',closeModal);$('scoreBackdrop').addEventListener('click',e=>{if(e.target===$('scoreBackdrop'))closeModal();});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();if(e.key==='Enter'&&!$('scoreBackdrop').classList.contains('hidden')&&document.activeElement===$('pointAmount')){e.preventDefault();confirmScore();}});
   $('historyContent').addEventListener('click',e=>{const b=e.target.closest('[data-delete]');if(!b)return;const r=state.records.find(r=>r.id===b.dataset.delete);if(!r)return;const s=state.students.find(s=>s.id===r.studentId);if(!confirm(`確定撤銷「${s?.name||'學生'}」於 ${timeText(r.time)} 的 ${r.delta>0?'+':''}${r.delta} 分紀錄？`))return;state.records=state.records.filter(item=>item.id!==r.id);persist();renderAll();toast('已撤銷這筆記分。');});
   $('historyPagination').addEventListener('click',e=>{if(e.target.id==='pagePrev')historyPage=Math.max(1,historyPage-1);if(e.target.id==='pageNext')historyPage++;renderHistory();});
-  try{$('githubRememberToken').checked=localStorage.getItem(GITHUB_REMEMBER_KEY)==='1';}catch(e){}
-  $('githubSaveToken').addEventListener('click',()=>{const token=$('githubToken').value.trim();if(!token){setSyncStatus('請先輸入 GitHub Token。','error');return;}try{sessionStorage.removeItem(GITHUB_TOKEN_KEY);localStorage.removeItem(GITHUB_TOKEN_KEY);if($('githubRememberToken').checked){localStorage.setItem(GITHUB_TOKEN_KEY,token);localStorage.setItem(GITHUB_REMEMBER_KEY,'1');}else{sessionStorage.setItem(GITHUB_TOKEN_KEY,token);localStorage.removeItem(GITHUB_REMEMBER_KEY);} $('githubToken').value='';setSyncStatus('Token 已儲存；之後會自動同步。','ok');}catch(e){setSyncStatus('瀏覽器不允許儲存 Token。','error');}});
-  $('githubClearToken').addEventListener('click',()=>{try{sessionStorage.removeItem(GITHUB_TOKEN_KEY);localStorage.removeItem(GITHUB_TOKEN_KEY);localStorage.removeItem(GITHUB_REMEMBER_KEY);}catch(e){}githubFileSha=null;$('githubRememberToken').checked=false;setSyncStatus('已清除 Token。');});
-  $('githubSyncNow').addEventListener('click',syncGithub);$('githubLoadNow').addEventListener('click',loadGithub);
-  let authenticated=false;try{authenticated=sessionStorage.getItem(AUTH_KEY)==='1';}catch(e){}if(authenticated)showApp();
+  $('cloudSyncNow').addEventListener('click',()=>{if(cloud.blocked){toast('請先匯出備份，再按「載入雲端」處理同步衝突。');return;}cloud.sync();});
+  $('cloudLoadNow').addEventListener('click',()=>{if((cloud.dirty()||cloud.blocked)&&!confirm('本機仍有未同步資料。建議先匯出 JSON 備份；確定以 Google 雲端資料取代本機？'))return;cloud.refresh(true);});
+  $('cloudLogout').addEventListener('click',()=>{if(cloud.dirty()&&!confirm('仍有未同步紀錄，建議等候保存完成。確定登出？'))return;cloud.stop();localStorage.removeItem(AUTH_KEY);sessionStorage.removeItem(AUTH_KEY);document.getElementById('login-screen').classList.remove('hidden');document.querySelector('.site').classList.add('hidden');$('loginError').textContent='';});
+  window.addEventListener('online',()=>cloud.queue(0));
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)cloud.refresh();});
+  window.addEventListener('beforeunload',e=>{if(cloud.dirty()){e.preventDefault();e.returnValue='';}});
+  setInterval(()=>{if(!document.hidden)cloud.refresh();},15000);
+  const savedSession=session();if(savedSession?.token&&savedSession.expires>Date.now()){showApp();cloud.ready=true;cloud.refresh();}
 })();
 </script>
 </body>
