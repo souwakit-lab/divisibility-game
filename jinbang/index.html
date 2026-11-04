@@ -99,6 +99,7 @@
           <h2 class="panel-heading" style="margin-bottom:8px">☁️ GitHub 自動同步</h2>
           <label class="field-label" for="githubToken">GitHub Token</label>
           <input id="githubToken" class="field" type="password" autocomplete="off" placeholder="ghp_… 或 github_pat_…">
+          <label class="check-wrap" style="margin-top:9px"><input id="githubRememberToken" type="checkbox"> 在此瀏覽器記住 Token</label>
           <div class="mini-pair" style="margin-top:9px"><button class="btn btn-pale" id="githubSaveToken">儲存 Token</button><button class="btn btn-pale" id="githubClearToken">清除 Token</button></div>
           <div class="mini-pair" style="margin-top:9px"><button class="btn btn-green" id="githubSyncNow">立即同步</button><button class="btn btn-pale" id="githubLoadNow">從 GitHub 載入</button></div>
           <p id="githubStatus" class="sync-status">未設定同步 Token。</p>
@@ -132,6 +133,7 @@
   const CLASS_KEY='keju_class_points_active_class_v1';
   const AUTH_KEY='keju_class_points_auth_v1';
   const GITHUB_TOKEN_KEY='keju_class_points_github_token_v1';
+  const GITHUB_REMEMBER_KEY='keju_class_points_github_remember_v1';
   const GITHUB_REPO='souwakit-lab/divisibility-game';
   const GITHUB_BRANCH='gh-pages';
   const GITHUB_PATH='jinbang/data/points.json';
@@ -169,7 +171,7 @@
   function visibleStudents(){let arr=state.students.filter(s=>activeClass==='all'||s.className===activeClass);if(searchText){const q=searchText.toLowerCase();arr=arr.filter(s=>(s.name+' '+s.number+' '+s.className).toLowerCase().includes(q));}const map=getStats();const compareNo=(a,b)=>String(a.number).localeCompare(String(b.number),'zh-Hant',{numeric:true});arr.sort((a,b)=>sortBy==='score'?(map.get(b.id).net-map.get(a.id).net || compareNo(a,b)):sortBy==='name'?(a.name.localeCompare(b.name,'zh-Hant') || compareNo(a,b)):(a.className.localeCompare(b.className,'zh-Hant',{numeric:true})||compareNo(a,b)));return arr;}
   function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),3100);}
   let githubFileSha=null,githubSyncTimer=null,githubSyncBusy=false;
-  const githubToken=()=>{try{return sessionStorage.getItem(GITHUB_TOKEN_KEY)||'';}catch(e){return '';}};
+  const githubToken=()=>{try{return sessionStorage.getItem(GITHUB_TOKEN_KEY)||localStorage.getItem(GITHUB_TOKEN_KEY)||'';}catch(e){return '';}};
   function setSyncStatus(msg,kind=''){const el=$('githubStatus');if(!el)return;el.textContent=msg;el.className='sync-status '+(kind?'sync-'+kind:'');}
   function persist(){try{localStorage.setItem(KEY,JSON.stringify({version:1,...state}));queueGithubSync();return true;}catch(e){toast('儲存失敗：瀏覽器空間不足，請立即匯出備份。');return false;}}
   function toBase64(text){const bytes=new TextEncoder().encode(text);let binary='';for(let i=0;i<bytes.length;i+=0x8000)binary+=String.fromCharCode(...bytes.subarray(i,i+0x8000));return btoa(binary);}
@@ -365,8 +367,9 @@
   $('confirmScore').addEventListener('click',confirmScore);$('cancelScore').addEventListener('click',closeModal);$('scoreBackdrop').addEventListener('click',e=>{if(e.target===$('scoreBackdrop'))closeModal();});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();if(e.key==='Enter'&&!$('scoreBackdrop').classList.contains('hidden')&&document.activeElement===$('pointAmount')){e.preventDefault();confirmScore();}});
   $('historyContent').addEventListener('click',e=>{const b=e.target.closest('[data-delete]');if(!b)return;const r=state.records.find(r=>r.id===b.dataset.delete);if(!r)return;const s=state.students.find(s=>s.id===r.studentId);if(!confirm(`確定撤銷「${s?.name||'學生'}」於 ${timeText(r.time)} 的 ${r.delta>0?'+':''}${r.delta} 分紀錄？`))return;state.records=state.records.filter(item=>item.id!==r.id);persist();renderAll();toast('已撤銷這筆記分。');});
   $('historyPagination').addEventListener('click',e=>{if(e.target.id==='pagePrev')historyPage=Math.max(1,historyPage-1);if(e.target.id==='pageNext')historyPage++;renderHistory();});
-  $('githubSaveToken').addEventListener('click',()=>{const token=$('githubToken').value.trim();if(!token){setSyncStatus('請先輸入 GitHub Token。','error');return;}try{sessionStorage.setItem(GITHUB_TOKEN_KEY,token);$('githubToken').value='';setSyncStatus('Token 已儲存；可按「立即同步」。','ok');}catch(e){setSyncStatus('瀏覽器不允許儲存 Token。','error');}});
-  $('githubClearToken').addEventListener('click',()=>{try{sessionStorage.removeItem(GITHUB_TOKEN_KEY);}catch(e){}githubFileSha=null;setSyncStatus('已清除 Token。');});
+  try{$('githubRememberToken').checked=localStorage.getItem(GITHUB_REMEMBER_KEY)==='1';}catch(e){}
+  $('githubSaveToken').addEventListener('click',()=>{const token=$('githubToken').value.trim();if(!token){setSyncStatus('請先輸入 GitHub Token。','error');return;}try{sessionStorage.removeItem(GITHUB_TOKEN_KEY);localStorage.removeItem(GITHUB_TOKEN_KEY);if($('githubRememberToken').checked){localStorage.setItem(GITHUB_TOKEN_KEY,token);localStorage.setItem(GITHUB_REMEMBER_KEY,'1');}else{sessionStorage.setItem(GITHUB_TOKEN_KEY,token);localStorage.removeItem(GITHUB_REMEMBER_KEY);} $('githubToken').value='';setSyncStatus('Token 已儲存；之後會自動同步。','ok');}catch(e){setSyncStatus('瀏覽器不允許儲存 Token。','error');}});
+  $('githubClearToken').addEventListener('click',()=>{try{sessionStorage.removeItem(GITHUB_TOKEN_KEY);localStorage.removeItem(GITHUB_TOKEN_KEY);localStorage.removeItem(GITHUB_REMEMBER_KEY);}catch(e){}githubFileSha=null;$('githubRememberToken').checked=false;setSyncStatus('已清除 Token。');});
   $('githubSyncNow').addEventListener('click',syncGithub);$('githubLoadNow').addEventListener('click',loadGithub);
   let authenticated=false;try{authenticated=sessionStorage.getItem(AUTH_KEY)==='1';}catch(e){}if(authenticated)showApp();
 })();
