@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-04T02:38:12.484Z",
+  "updatedAt": "2026-11-04T02:48:35.186Z",
   "students": [
     {
       "id": "9f7cd40f-9ea2-45a1-80fb-66d18c8cdb0c",
@@ -533,6 +533,14 @@
       "reason": "上課不專心",
       "time": "2026-11-04T02:38:11.680Z",
       "batchId": "49342fe3-2a94-4edf-8de7-2b365ddf9d40"
+    },
+    {
+      "id": "9d410ffc-1252-4726-b7b2-c87d76d0bacf",
+      "studentId": "a7a94e24-49d9-4168-9e37-6389215fb38e",
+      "delta": 2,
+      "reason": "積極回答問題",
+      "time": "2026-11-04T02:48:34.380Z",
+      "batchId": "2d89801c-4b7d-4505-be53-736afb33e04c"
     }
   ]
 }
