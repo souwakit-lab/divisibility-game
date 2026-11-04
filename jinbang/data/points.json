@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-04T02:50:21.374Z",
+  "updatedAt": "2026-11-04T02:55:56.454Z",
   "students": [
     {
       "id": "9f7cd40f-9ea2-45a1-80fb-66d18c8cdb0c",
@@ -589,6 +589,54 @@
       "reason": "積極回答問題",
       "time": "2026-11-04T02:50:20.573Z",
       "batchId": "665ea13f-b074-4a2e-9c05-fb7bb1995b3a"
+    },
+    {
+      "id": "c6a74e1e-08aa-4a62-8df8-cf8811e2dea8",
+      "studentId": "2b636336-0b0b-4226-8d4a-c64f714fb2ef",
+      "delta": 2,
+      "reason": "積極回答問題",
+      "time": "2026-11-04T02:55:55.647Z",
+      "batchId": "d656b262-f549-4ab1-be21-a4f3465ba09a"
+    },
+    {
+      "id": "daa60f02-cf80-40c4-815a-f32414209a33",
+      "studentId": "293caa00-0c6b-4bc8-a79c-3356455e6c8a",
+      "delta": 2,
+      "reason": "積極回答問題",
+      "time": "2026-11-04T02:55:55.647Z",
+      "batchId": "d656b262-f549-4ab1-be21-a4f3465ba09a"
+    },
+    {
+      "id": "5c29d0ca-4922-4716-8c08-4d32e657d998",
+      "studentId": "9f7cd40f-9ea2-45a1-80fb-66d18c8cdb0c",
+      "delta": 2,
+      "reason": "積極回答問題",
+      "time": "2026-11-04T02:55:55.647Z",
+      "batchId": "d656b262-f549-4ab1-be21-a4f3465ba09a"
+    },
+    {
+      "id": "d7dfcfca-aa14-426a-aa17-b37abbf00903",
+      "studentId": "595f8750-e386-46aa-9092-d683e88645af",
+      "delta": 2,
+      "reason": "積極回答問題",
+      "time": "2026-11-04T02:55:55.647Z",
+      "batchId": "d656b262-f549-4ab1-be21-a4f3465ba09a"
+    },
+    {
+      "id": "d5993be3-7cfd-40f3-871a-c9a4c5f07424",
+      "studentId": "6d98e283-1451-4ae2-b4d4-da6008af4844",
+      "delta": 2,
+      "reason": "積極回答問題",
+      "time": "2026-11-04T02:55:55.647Z",
+      "batchId": "d656b262-f549-4ab1-be21-a4f3465ba09a"
+    },
+    {
+      "id": "0ad1fb1b-adba-4065-ad5e-8e5c69da9231",
+      "studentId": "896b2c9d-4676-4aef-acc8-b1a9857308c1",
+      "delta": 2,
+      "reason": "積極回答問題",
+      "time": "2026-11-04T02:55:55.647Z",
+      "batchId": "d656b262-f549-4ab1-be21-a4f3465ba09a"
     }
   ]
 }
