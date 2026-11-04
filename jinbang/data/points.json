@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-04T02:37:02.109Z",
+  "updatedAt": "2026-11-04T02:38:12.484Z",
   "students": [
     {
       "id": "9f7cd40f-9ea2-45a1-80fb-66d18c8cdb0c",
@@ -517,6 +517,22 @@
       "reason": "欠交功課",
       "time": "2026-11-04T02:37:01.306Z",
       "batchId": "d12ff648-c951-437e-af83-f44ab94bc9e0"
+    },
+    {
+      "id": "0c0c6677-cb8d-41b1-ac35-fcab7b7897db",
+      "studentId": "ba0f8b91-f987-4cf8-aae3-882a0b464f4b",
+      "delta": -1,
+      "reason": "上課不專心",
+      "time": "2026-11-04T02:38:11.680Z",
+      "batchId": "49342fe3-2a94-4edf-8de7-2b365ddf9d40"
+    },
+    {
+      "id": "98ac3e8b-d5fe-452d-90ab-cab71c02d48c",
+      "studentId": "b32dd030-c107-4baf-98e0-c9df9bb3a3fb",
+      "delta": -1,
+      "reason": "上課不專心",
+      "time": "2026-11-04T02:38:11.680Z",
+      "batchId": "49342fe3-2a94-4edf-8de7-2b365ddf9d40"
     }
   ]
 }
