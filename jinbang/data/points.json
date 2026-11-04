@@ -1,6 +1,409 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-04T02:05:22.153Z",
-  "students": [],
+  "updatedAt": "2026-11-04T02:31:29.963Z",
+  "students": [
+    {
+      "id": "9f7cd40f-9ea2-45a1-80fb-66d18c8cdb0c",
+      "className": "SG1A",
+      "number": "1",
+      "name": "歐陽周政"
+    },
+    {
+      "id": "6d98e283-1451-4ae2-b4d4-da6008af4844",
+      "className": "SG1A",
+      "number": "2",
+      "name": "歐芷菱"
+    },
+    {
+      "id": "96807267-2e74-4bb9-9ee9-ed3eea8db08d",
+      "className": "SG1A",
+      "number": "3",
+      "name": "蔡銀杰"
+    },
+    {
+      "id": "72c13f01-b4e6-4170-af4d-82a009d505b5",
+      "className": "SG1A",
+      "number": "4",
+      "name": "陳俊希"
+    },
+    {
+      "id": "f186b6dd-cd9d-4b8f-b105-f11f3ea3efed",
+      "className": "SG1A",
+      "number": "5",
+      "name": "陳炯文"
+    },
+    {
+      "id": "7e2c6987-9fdf-4e08-8d42-302a72f728ab",
+      "className": "SG1A",
+      "number": "6",
+      "name": "陳宇恆"
+    },
+    {
+      "id": "8590fc1a-8288-44ce-9af3-55604c377cea",
+      "className": "SG1A",
+      "number": "7",
+      "name": "陳柏豪"
+    },
+    {
+      "id": "ad21c85b-1ad5-4405-83ad-c7dd5d299a37",
+      "className": "SG1A",
+      "number": "8",
+      "name": "卓莉珊"
+    },
+    {
+      "id": "a7a94e24-49d9-4168-9e37-6389215fb38e",
+      "className": "SG1A",
+      "number": "9",
+      "name": "莊超穎"
+    },
+    {
+      "id": "41100734-9c36-4a62-bf58-1c0e1eee11cd",
+      "className": "SG1A",
+      "number": "10",
+      "name": "鍾欣澄"
+    },
+    {
+      "id": "38467ef5-9510-4486-95be-f5172f0031f5",
+      "className": "SG1A",
+      "number": "11",
+      "name": "馮子軒"
+    },
+    {
+      "id": "a428c0cc-e534-45d3-b083-8150bc9b75eb",
+      "className": "SG1A",
+      "number": "12",
+      "name": "黃鈞亮"
+    },
+    {
+      "id": "a684045f-7466-48e0-9bd4-5b65c0c42bd6",
+      "className": "SG1A",
+      "number": "13",
+      "name": "林立"
+    },
+    {
+      "id": "595f8750-e386-46aa-9092-d683e88645af",
+      "className": "SG1A",
+      "number": "14",
+      "name": "李振豪"
+    },
+    {
+      "id": "69200404-8807-4e70-b21e-61d3482889c1",
+      "className": "SG1A",
+      "number": "15",
+      "name": "李梓琪"
+    },
+    {
+      "id": "293caa00-0c6b-4bc8-a79c-3356455e6c8a",
+      "className": "SG1A",
+      "number": "16",
+      "name": "李沁穎"
+    },
+    {
+      "id": "b32dd030-c107-4baf-98e0-c9df9bb3a3fb",
+      "className": "SG1A",
+      "number": "17",
+      "name": "李宇杰"
+    },
+    {
+      "id": "2b636336-0b0b-4226-8d4a-c64f714fb2ef",
+      "className": "SG1A",
+      "number": "18",
+      "name": "梁依靜"
+    },
+    {
+      "id": "f82bf363-0399-4df5-892d-5de85adb3652",
+      "className": "SG1A",
+      "number": "19",
+      "name": "梁羽盈"
+    },
+    {
+      "id": "896b2c9d-4676-4aef-acc8-b1a9857308c1",
+      "className": "SG1A",
+      "number": "20",
+      "name": "盧佩辰"
+    },
+    {
+      "id": "b8cd0239-81b9-40a6-aee1-816e839a4c9b",
+      "className": "SG1A",
+      "number": "21",
+      "name": "黃夢琪"
+    },
+    {
+      "id": "6bd1f341-d846-454a-b076-d834bc6629e2",
+      "className": "SG1A",
+      "number": "22",
+      "name": "趙家美"
+    },
+    {
+      "id": "13bf63bf-059a-4343-903d-88f899d20a66",
+      "className": "SG1A",
+      "number": "23",
+      "name": "歐陽浩賢"
+    },
+    {
+      "id": "d509afd2-3e09-4263-84bc-e9d576f40b5f",
+      "className": "SG1A",
+      "number": "24",
+      "name": "陳家莉"
+    },
+    {
+      "id": "c293292b-7df9-4eac-b7ff-b08767473fe1",
+      "className": "SG1A",
+      "number": "25",
+      "name": "歐承澔"
+    },
+    {
+      "id": "ad444641-a175-450b-9ec3-94f344b72629",
+      "className": "SG1A",
+      "number": "26",
+      "name": "張子茵"
+    },
+    {
+      "id": "00daea9f-36e4-4005-8a9f-f47ad8d9e920",
+      "className": "SG1A",
+      "number": "27",
+      "name": "徐希瑜"
+    },
+    {
+      "id": "bb7994e1-cad4-4e69-88ae-c4d3d18f77cb",
+      "className": "SG1A",
+      "number": "28",
+      "name": "邢嘉豪"
+    },
+    {
+      "id": "ba0f8b91-f987-4cf8-aae3-882a0b464f4b",
+      "className": "SG1A",
+      "number": "29",
+      "name": "楊昊宇"
+    },
+    {
+      "id": "1305dd61-b602-468e-b3c1-c35ac92786ed",
+      "className": "SG1A",
+      "number": "30",
+      "name": "邱嘉成"
+    },
+    {
+      "id": "6800ab41-6982-4197-9fcf-e95f10404df0",
+      "className": "SG1A",
+      "number": "31",
+      "name": "郭添滿"
+    },
+    {
+      "id": "f5367109-ca9d-4bea-9096-6af3681e1d00",
+      "className": "SG1A",
+      "number": "32",
+      "name": "王思淇"
+    },
+    {
+      "id": "dbac9965-580e-4fb5-accb-7a1c3f28f59f",
+      "className": "SG1A",
+      "number": "33",
+      "name": "黃鈺裕"
+    },
+    {
+      "id": "8a9604c9-063b-48d9-b24a-5f8a022a11ff",
+      "className": "SG1A",
+      "number": "34",
+      "name": "黃健樺"
+    },
+    {
+      "id": "c3156893-d13d-4e07-b1be-1496b43061c8",
+      "className": "SG1B",
+      "number": "1",
+      "name": "陳  毅"
+    },
+    {
+      "id": "b0b9ab01-36d0-4c90-bfb1-13f14569c63b",
+      "className": "SG1B",
+      "number": "2",
+      "name": "曾蔚喬"
+    },
+    {
+      "id": "ea7139ae-f24c-49b9-b5fd-f09b48606060",
+      "className": "SG1B",
+      "number": "3",
+      "name": "鄭凱琳"
+    },
+    {
+      "id": "547445bd-8b61-4b93-9497-5ac28a85b0e6",
+      "className": "SG1B",
+      "number": "4",
+      "name": "陳思如"
+    },
+    {
+      "id": "8328b67d-64fd-49c4-9d04-8075694ef116",
+      "className": "SG1B",
+      "number": "5",
+      "name": "程家儀"
+    },
+    {
+      "id": "d763b07f-db26-496a-9cb6-f86e9c45872d",
+      "className": "SG1B",
+      "number": "6",
+      "name": "張芯然"
+    },
+    {
+      "id": "6f3480e4-c902-407e-83eb-9654d9203bf6",
+      "className": "SG1B",
+      "number": "7",
+      "name": "蔡朗然"
+    },
+    {
+      "id": "769700cf-7f6f-4410-81e0-e9229aca1301",
+      "className": "SG1B",
+      "number": "8",
+      "name": "董詩予"
+    },
+    {
+      "id": "066944fc-feb4-491f-b329-2f52b3965c52",
+      "className": "SG1B",
+      "number": "9",
+      "name": "馮家宥"
+    },
+    {
+      "id": "94611aaf-3015-4d5b-b5e0-bc1fcffaa5f0",
+      "className": "SG1B",
+      "number": "10",
+      "name": "管梓皓"
+    },
+    {
+      "id": "c2df9d62-bf11-407d-bafb-3569e4f40f9f",
+      "className": "SG1B",
+      "number": "11",
+      "name": "黎芷盈"
+    },
+    {
+      "id": "024cbf9f-fb06-45c3-8b98-660b9ca9cece",
+      "className": "SG1B",
+      "number": "12",
+      "name": "劉德偉"
+    },
+    {
+      "id": "06590893-07b7-405b-8c36-48dfb76e53df",
+      "className": "SG1B",
+      "number": "13",
+      "name": "李善婷"
+    },
+    {
+      "id": "dca94f1e-389e-4154-8c52-2ed4e922f7e8",
+      "className": "SG1B",
+      "number": "14",
+      "name": "李雅琪"
+    },
+    {
+      "id": "5c79e08d-7df1-4c2a-8972-1105caa11f59",
+      "className": "SG1B",
+      "number": "15",
+      "name": "凌寶旋"
+    },
+    {
+      "id": "077355d9-905d-45f1-99d6-8f95a59f4605",
+      "className": "SG1B",
+      "number": "16",
+      "name": "吳靖怡"
+    },
+    {
+      "id": "5fe2b47e-1b38-4676-b856-7fa1e19a700f",
+      "className": "SG1B",
+      "number": "17",
+      "name": "宋允曦"
+    },
+    {
+      "id": "5271a49f-b1d8-440b-b2bb-8bac3441642a",
+      "className": "SG1B",
+      "number": "18",
+      "name": "譚梓軒"
+    },
+    {
+      "id": "00126a73-03d4-48de-a8a1-44f27432d09d",
+      "className": "SG1B",
+      "number": "19",
+      "name": "譚詩敏"
+    },
+    {
+      "id": "b0572504-da66-4d2d-bd70-4d6fa3221b9c",
+      "className": "SG1B",
+      "number": "20",
+      "name": "袁渟欣"
+    },
+    {
+      "id": "e1588289-2371-4f45-a07a-29749ed85b7b",
+      "className": "SG1B",
+      "number": "21",
+      "name": "曾凱龍"
+    },
+    {
+      "id": "50ff0798-0b36-462d-a12c-59681f8d0c59",
+      "className": "SG1B",
+      "number": "22",
+      "name": "鄭家林"
+    },
+    {
+      "id": "95cbdfd0-5b56-486e-a89f-7fe2fe5e65d4",
+      "className": "SG1B",
+      "number": "23",
+      "name": "張昊臻"
+    },
+    {
+      "id": "87092f29-5488-4e07-91a1-2e8703f499ac",
+      "className": "SG1B",
+      "number": "24",
+      "name": "何家浩"
+    },
+    {
+      "id": "35382c0d-11a7-4913-b77e-d5ac3f951300",
+      "className": "SG1B",
+      "number": "25",
+      "name": "陳梓峰"
+    },
+    {
+      "id": "29c5aefe-37f0-4ed9-9099-ca81ffd8da43",
+      "className": "SG1B",
+      "number": "26",
+      "name": "林灝晴"
+    },
+    {
+      "id": "3689177e-182b-44d2-8a71-feb28f606476",
+      "className": "SG1B",
+      "number": "27",
+      "name": "林文軒"
+    },
+    {
+      "id": "d5807fd0-4c64-41da-9515-9c9079036225",
+      "className": "SG1B",
+      "number": "28",
+      "name": "梁王恩"
+    },
+    {
+      "id": "5612a0d1-7162-4c3f-b6d0-f3411bc664c2",
+      "className": "SG1B",
+      "number": "30",
+      "name": "盧家豪"
+    },
+    {
+      "id": "22589ba1-51d3-42b9-b5bf-0196499f8ec4",
+      "className": "SG1B",
+      "number": "31",
+      "name": "勞允睿"
+    },
+    {
+      "id": "135aed55-e0d9-4d90-9073-7d824d2978ee",
+      "className": "SG1B",
+      "number": "32",
+      "name": "勞允堤"
+    },
+    {
+      "id": "113214a9-335c-4515-9e7a-6ec03a5aedf9",
+      "className": "SG1B",
+      "number": "33",
+      "name": "黃曉樂"
+    },
+    {
+      "id": "635b509e-ad3c-4dd0-98e3-4cd6a05756ce",
+      "className": "SG1B",
+      "number": "34",
+      "name": "王敬興"
+    }
+  ],
   "records": []
 }
