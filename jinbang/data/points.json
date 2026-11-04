@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-04T02:33:58.848Z",
+  "updatedAt": "2026-11-04T02:37:02.109Z",
   "students": [
     {
       "id": "9f7cd40f-9ea2-45a1-80fb-66d18c8cdb0c",
@@ -453,6 +453,70 @@
       "reason": "上課不專心",
       "time": "2026-11-04T02:33:58.044Z",
       "batchId": "50198bf1-3fcc-4066-9116-5f7914b33ba7"
+    },
+    {
+      "id": "d9f4f50e-c534-4528-988c-1097c2283d0b",
+      "studentId": "c293292b-7df9-4eac-b7ff-b08767473fe1",
+      "delta": -1,
+      "reason": "欠交功課",
+      "time": "2026-11-04T02:37:01.306Z",
+      "batchId": "d12ff648-c951-437e-af83-f44ab94bc9e0"
+    },
+    {
+      "id": "ef9ec53d-f557-40b8-a4fc-6abe6167bad9",
+      "studentId": "f186b6dd-cd9d-4b8f-b105-f11f3ea3efed",
+      "delta": -1,
+      "reason": "欠交功課",
+      "time": "2026-11-04T02:37:01.306Z",
+      "batchId": "d12ff648-c951-437e-af83-f44ab94bc9e0"
+    },
+    {
+      "id": "332386fe-dfe2-45c0-be77-2d7bbb9ad807",
+      "studentId": "ba0f8b91-f987-4cf8-aae3-882a0b464f4b",
+      "delta": -1,
+      "reason": "欠交功課",
+      "time": "2026-11-04T02:37:01.306Z",
+      "batchId": "d12ff648-c951-437e-af83-f44ab94bc9e0"
+    },
+    {
+      "id": "23a352d2-1791-43dd-8489-b5c63d54b968",
+      "studentId": "6800ab41-6982-4197-9fcf-e95f10404df0",
+      "delta": -1,
+      "reason": "欠交功課",
+      "time": "2026-11-04T02:37:01.306Z",
+      "batchId": "d12ff648-c951-437e-af83-f44ab94bc9e0"
+    },
+    {
+      "id": "88ea3fc9-10f2-4347-8f69-6a4bcb12d737",
+      "studentId": "595f8750-e386-46aa-9092-d683e88645af",
+      "delta": -1,
+      "reason": "欠交功課",
+      "time": "2026-11-04T02:37:01.306Z",
+      "batchId": "d12ff648-c951-437e-af83-f44ab94bc9e0"
+    },
+    {
+      "id": "c9dbdcf3-f77e-40b6-a6bd-96786d980047",
+      "studentId": "96807267-2e74-4bb9-9ee9-ed3eea8db08d",
+      "delta": -1,
+      "reason": "欠交功課",
+      "time": "2026-11-04T02:37:01.306Z",
+      "batchId": "d12ff648-c951-437e-af83-f44ab94bc9e0"
+    },
+    {
+      "id": "9ff62b33-238a-4aa8-aeb8-c4726d96c337",
+      "studentId": "9f7cd40f-9ea2-45a1-80fb-66d18c8cdb0c",
+      "delta": -1,
+      "reason": "欠交功課",
+      "time": "2026-11-04T02:37:01.306Z",
+      "batchId": "d12ff648-c951-437e-af83-f44ab94bc9e0"
+    },
+    {
+      "id": "7afdb683-3684-4306-896c-8bdc5b01f618",
+      "studentId": "7e2c6987-9fdf-4e08-8d42-302a72f728ab",
+      "delta": -1,
+      "reason": "欠交功課",
+      "time": "2026-11-04T02:37:01.306Z",
+      "batchId": "d12ff648-c951-437e-af83-f44ab94bc9e0"
     }
   ]
 }
