@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-04T02:59:14.125Z",
+  "updatedAt": "2026-11-04T03:02:22.319Z",
   "students": [
     {
       "id": "9f7cd40f-9ea2-45a1-80fb-66d18c8cdb0c",
@@ -645,6 +645,14 @@
       "reason": "",
       "time": "2026-11-04T02:59:13.319Z",
       "batchId": "d23ce972-dc54-41f6-bca2-5c6649d022c9"
+    },
+    {
+      "id": "f52a9acc-ce74-4024-9639-64a5c0cc1ae0",
+      "studentId": "38467ef5-9510-4486-95be-f5172f0031f5",
+      "delta": -1,
+      "reason": "",
+      "time": "2026-11-04T03:02:21.512Z",
+      "batchId": "11f384fd-f220-4d58-b6be-735a8792213b"
     }
   ]
 }
