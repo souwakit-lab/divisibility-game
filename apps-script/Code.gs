@@ -80,6 +80,7 @@ function doPost(e) {
   const lock = LockService.getScriptLock();
   lock.waitLock(15000);
   try {
+    if (String(e.parameter.action || '').startsWith('jinbang')) return jsonResponse(jinbangRoute_(e));
     const payload = JSON.parse(e.parameter.data || "{}");
     const action = String(e.parameter.action || "");
     if (action === "resetNthTerm") {
