@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-04T02:55:56.454Z",
+  "updatedAt": "2026-11-04T02:59:14.125Z",
   "students": [
     {
       "id": "9f7cd40f-9ea2-45a1-80fb-66d18c8cdb0c",
@@ -637,6 +637,14 @@
       "reason": "積極回答問題",
       "time": "2026-11-04T02:55:55.647Z",
       "batchId": "d656b262-f549-4ab1-be21-a4f3465ba09a"
+    },
+    {
+      "id": "d6a83871-b936-4b11-8cb7-f274a0cfe912",
+      "studentId": "13bf63bf-059a-4343-903d-88f899d20a66",
+      "delta": -1,
+      "reason": "",
+      "time": "2026-11-04T02:59:13.319Z",
+      "batchId": "d23ce972-dc54-41f6-bca2-5c6649d022c9"
     }
   ]
 }
