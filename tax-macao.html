@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#091329">
+<title>人教版 A 版｜个人所得税与澳门职业税：教材例题·拓展版</title>
+<style>
+:root{--bg:#07112a;--deep:#08142d;--ink:#f4f8ff;--muted:#b9cee8;--cyan:#69dfff;--cyan2:#91eaff;--gold:#ffe0a0;--yellow:#fff06b;--line:#78caff83;--panel:#102447ed;--lightline:#90caff38}
+*{box-sizing:border-box}html,body{margin:0;height:100%}body{background:#07122b;color:var(--ink);font-family:"Noto Sans SC","Noto Sans TC","Microsoft YaHei","PingFang SC","Microsoft JhengHei",Arial,sans-serif;overflow:hidden}
+.sky{position:fixed;inset:0;z-index:-2;background:radial-gradient(ellipse at 78% 15%,#5b448d65,transparent 48%),radial-gradient(ellipse at 13% 83%,#0871aa55,transparent 50%),linear-gradient(133deg,#060c24,#111e41 61%,#180f2c)}
+.sky::before{content:"";position:absolute;inset:0;background-image:linear-gradient(#7fd6ff0a 1px,transparent 1px),linear-gradient(90deg,#7fd6ff0a 1px,transparent 1px);background-size:60px 60px;mask-image:linear-gradient(transparent,#000)}
+.sky::after{content:"";position:absolute;inset:0;background-image:radial-gradient(#bceeffb0 1px,transparent 2px),radial-gradient(#ffe3a38c 1px,transparent 2px);background-size:131px 168px,203px 197px;background-position:12px 26px,63px 92px;opacity:.5}
+.app{height:100dvh;min-height:540px;max-width:1500px;padding:13px 25px 14px;margin:auto;display:flex;flex-direction:column;gap:12px}
+.header{height:67px;flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #8aceee57;gap:16px;padding:2px 3px 9px}
+.eyebrow{font-size:12px;letter-spacing:.16em;color:var(--cyan);font-weight:900}.header h1{margin:4px 0 0;font-size:clamp(22px,2.1vw,31px);color:var(--gold);line-height:1.1;text-shadow:0 0 18px #e6bc7653}.right{display:flex;align-items:center;gap:10px}.pill{border:1px solid #90cfff75;background:#1a315491;color:#d5e8ff;padding:8px 14px;border-radius:40px;font-size:13px;white-space:nowrap}.btn{border:1px solid #91d9ff90;background:#18355f;color:#e7f6ff;border-radius:12px;padding:10px 17px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit}.btn:hover{filter:brightness(1.2)}.btn:disabled{opacity:.35;cursor:not-allowed}.btn.primary{background:linear-gradient(130deg,#ffe8af,#e7b866);border-color:#fef0c7;color:#18213e}
+.slides{flex:1;min-height:0;position:relative}.slide{height:100%;display:none;overflow:auto;padding:4px 2px 9px;scrollbar-color:#70bee77a transparent}.slide.active{display:flex;flex-direction:column;justify-content:flex-start;animation:appear .22s ease both}@keyframes appear{from{opacity:.65;transform:translateY(7px)}to{opacity:1;transform:none}}
+.kicker{font-size:clamp(13px,1.22vw,17px);font-weight:900;color:var(--cyan);letter-spacing:.06em;margin:2px 0 5px}.title{font-size:clamp(29px,2.95vw,42px);color:var(--gold);line-height:1.2;margin:0 0 13px}.sub{font-size:clamp(17px,1.62vw,23px);color:#c7def4;line-height:1.55;margin:0 0 15px}
+.panel{background:linear-gradient(126deg,#142a50f5,#0e1d3df2);border:1.5px solid var(--line);box-shadow:0 14px 45px #0005,inset 0 1px #ffffff1c;border-radius:20px;padding:clamp(17px,2.1vw,30px);min-width:0}.panel.soft{background:#0e203eeb}.panel.gold{border-color:#f2d58e91;background:linear-gradient(128deg,#2b2b40ee,#152341ed)}.panel h3{color:#aeeaff;font-size:clamp(20px,1.9vw,27px);margin:0 0 10px}.panel p{margin:9px 0;line-height:1.65}.panel.tight{padding:14px 18px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}.grid57{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:18px}.grid46{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:18px}.grid64{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:18px}
+.prose{font-size:clamp(18px,1.62vw,23px);line-height:1.68;color:#eff7ff}.prose.small{font-size:clamp(16px,1.48vw,21px)}.prose.medium{font-size:clamp(18px,1.8vw,25px)}.cyan{color:#79e3ff;font-weight:900}.goldtext{color:#ffe3a2;font-weight:900}.yellow{color:var(--yellow);font-weight:900}.dim{color:var(--muted)}.unit{font-size:.71em;color:#b9cfe9;font-weight:600}.center{text-align:center}.math{font-family:Arial,"Noto Sans SC","Microsoft Yahei",sans-serif;letter-spacing:-.02em;font-weight:800;font-variant-numeric:tabular-nums}.math.big{font-size:clamp(27px,2.45vw,37px)}.math.medium{font-size:clamp(22px,2.15vw,32px)}.math.small{font-size:clamp(19px,1.75vw,26px)}.mathbar{padding:15px 20px;border-radius:14px;border:1px solid #80ceec88;background:#0b1b39cc;margin-top:10px}.mathbar.gold{background:#44381e68;border-color:#e7c77b8c}
+.tax{width:100%;border-collapse:separate;border-spacing:0;border:1px solid #83cbebae;border-radius:12px;overflow:hidden;font-size:clamp(15px,1.22vw,19px);table-layout:fixed}.tax th{background:#b7dff2;color:#183353;font-size:clamp(14px,1.2vw,18px);padding:9px 4px}.tax td{padding:clamp(6px,1vh,10px) 5px;text-align:center;border-top:1px solid #7fa6bc45;background:#0a1d3d8c}.tax tr:nth-child(even) td{background:#17325784}.tax td:first-child{color:#ffdb93;font-weight:900}.tax .interval{white-space:nowrap}.tax strong{color:#e9f5ff}.tax.highlight-row tr:nth-child(2) td{background:#274561c4}
+.problem-card{border-left:5px solid var(--cyan);padding:20px 24px;background:#123153bb;border-radius:0 17px 17px 0;margin:10px 0}.problem-card .qnum{font-size:clamp(24px,2.1vw,31px);font-weight:900;color:var(--gold);margin-right:12px}.problem-card p{display:inline;font-size:clamp(20px,1.87vw,28px);line-height:1.7}.problem-card.long p{font-size:clamp(20px,1.85vw,27px)}.note{font-size:clamp(15px,1.31vw,19px);line-height:1.55;color:#bbd2e9}.smalllabel{font-size:14px;letter-spacing:.06em;color:#9bdeff;font-weight:900}
+.casebox{display:grid;grid-template-columns:auto 25px minmax(0,1fr);gap:7px;align-items:center;margin:0 auto}.casehead{font-size:clamp(25px,2.5vw,38px);white-space:nowrap;color:#fff1bb;font-family:Arial,"Microsoft Yahei",sans-serif}.brace{height:100%;min-height:230px;width:25px;display:block}.case-lines{display:flex;flex-direction:column;gap:2px}.case-line{display:grid;grid-template-columns:minmax(210px,.7fr) minmax(260px,1fr);align-items:center;gap:18px;border-bottom:1px solid #73acd533;padding:7px 11px;min-height:41px;font-size:clamp(20px,1.87vw,28px);font-weight:750;font-variant-numeric:tabular-nums;font-family:Arial,"Noto Sans SC",sans-serif}.case-line:last-child{border-bottom:0}.case-line .expr{color:#eafbff}.case-line .interval{color:#c6d8ed;font-size:.80em;white-space:nowrap}.case-line:nth-child(odd){background:#17345654;border-radius:7px}.case-line .expr b{color:#7de4ff}.casebox.compact .case-line{font-size:clamp(19px,1.6vw,25px);min-height:39px;padding:4px 10px}.casebox.compact .case-line .interval{font-size:.85em}
+.equation{font-size:clamp(23px,2.14vw,33px);line-height:1.66;font-family:Arial,"Noto Sans SC","Microsoft Yahei",sans-serif;font-weight:800;white-space:nowrap;font-variant-numeric:tabular-nums}.equation.indented{padding-left:2em}.equation .result{color:#fff077;font-weight:950}.calc{display:grid;gap:11px}.calcrow{border:1px solid #6eb8d875;background:#0d2749a6;border-radius:12px;padding:12px 17px}.calcrow .meta{font-size:clamp(15px,1.35vw,19px);color:#b8dcf0;font-weight:850;margin-bottom:3px}.calcrow .value{font-size:clamp(20px,1.9vw,27px);color:#effaff;font-weight:900}.calcrow .final{font-size:clamp(24px,2.65vw,39px);color:#fff07e;font-weight:950}.resultpanel{padding:25px;border:1.5px solid #f6da948f;border-radius:20px;background:linear-gradient(115deg,#493c2288,#193152a6)}.resultpanel .answer{font-size:clamp(37px,4.9vw,72px);font-weight:950;color:#fff39d;line-height:1.22;text-align:center;margin:18px 0}.resultpanel .answer small{font-size:.42em}
+.bound-table{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;border-radius:13px;border:1px solid #7ecaff86;table-layout:fixed;font-family:Arial,"Noto Sans SC",sans-serif;font-size:clamp(18px,1.55vw,24px);font-weight:780}.bound-table th{color:#153154;background:#aedeef;padding:10px}.bound-table td{text-align:center;background:#0f294a;padding:12px;border-top:1px solid #74b0d65c}.bound-table tr:nth-child(even) td{background:#1b33538c}.bound-table td:last-child{color:#ffecb5}.mini-case{border:1px solid #7abddc87;border-radius:13px;background:#112747d9;padding:13px 18px;margin-bottom:10px}.mini-case .range{font-size:clamp(17px,1.6vw,24px);color:#95ddf8;font-weight:880;margin-bottom:7px}.mini-case .rule{font-size:clamp(20px,1.88vw,28px);color:#f0f7ff;font-weight:850;white-space:nowrap;font-family:Arial,"Microsoft Yahei",sans-serif}.mini-case .rule b{color:#fff2a4}.mini-case.small .range{font-size:clamp(17px,1.36vw,21px)}.mini-case.small .rule{font-size:clamp(20px,1.63vw,25px)}
+.chartWrap{border:1.5px solid #87ccec87;background:#091b39cc;padding:8px;border-radius:20px}.chartSvg{width:100%;display:block;max-height:58vh}.legend{font-size:clamp(15px,1.29vw,19px);color:#cbdff5;line-height:1.5}.footnote{margin-top:12px;color:#9ab8d7;font-size:13px}.footer{border-top:1px solid #79cff64a;min-height:58px;flex:0 0 auto;display:flex;justify-content:space-between;align-items:center;gap:12px;padding-top:10px}.pager{display:flex;align-items:center;gap:9px}.pager .count{font:900 17px Arial,sans-serif;color:#ffe5a4;white-space:nowrap}.chapter{color:#bcd3e8;font-size:14px}.jump{background:#102b51;color:#edfbff;border:1px solid #72caee91;border-radius:9px;padding:10px 11px;font:700 14px inherit;max-width:300px}
+@media(max-height:800px){.app{gap:8px;padding:10px 20px}.header{height:59px}.title{font-size:clamp(25px,2.67vw,37px);margin-bottom:9px}.panel{padding:16px 21px}.problem-card{padding:13px 19px;margin:6px 0}.problem-card p{font-size:clamp(19px,1.7vw,24px)}.prose{font-size:clamp(16px,1.47vw,20px)}.tax td{padding:6px 5px}.mathbar{padding:11px 17px}.case-line{min-height:35px;padding:5px 9px;font-size:clamp(19px,1.7vw,24px)}.casebox.compact .case-line{min-height:35px;padding:3px 9px}.footer{min-height:52px}}
+@media(max-width:980px){.grid2,.grid57,.grid46,.grid64{grid-template-columns:1fr}.slide.active{justify-content:flex-start}.panel{padding:17px}.right .pill{display:none}.case-line{grid-template-columns:minmax(160px,.8fr) minmax(200px,1fr)}}
+@media(max-width:600px){.app{padding:9px 10px}.header{height:55px}.header h1{font-size:19px}.eyebrow{font-size:10px}.title{font-size:25px}.problem-card p{font-size:18px}.math.big{font-size:23px}.equation{font-size:19px;white-space:normal}.tax{font-size:12px}.tax th{font-size:11px}.case-line{font-size:15px;grid-template-columns:1fr;gap:2px}.case-line .interval{font-size:13px}.brace{width:15px}.casebox{grid-template-columns:auto 15px minmax(0,1fr)}.casehead{font-size:20px}.casebox.compact .case-line{font-size:16px}.panel{padding:14px}.btn{padding:8px 9px;font-size:13px}.footer .chapter{display:none}.jump{max-width:160px}}
+@media print{body{overflow:visible;background:white}.sky,.header .right,.footer{display:none!important}.app{height:auto;display:block;padding:0}.header{background:#102041;padding:10px}.slide,.slide.active{display:flex!important;height:180mm;break-after:page;overflow:hidden;background:#081b38;padding:14mm;margin-bottom:10px;-webkit-print-color-adjust:exact;print-color-adjust:exact}.chartSvg{max-height:120mm}.panel{box-shadow:none}}
+
+/* Projector-fit adjustments for the dense textbook pages. */
+.slide:nth-child(9) .bound-table td{padding:9px 10px}
+.slide:nth-child(1) .panel{padding:11px 15px}
+.slide:nth-child(1) .panel.tight{padding:11px 14px}
+.slide:nth-child(1) .tax td{padding:5px 4px}
+.slide:nth-child(1) .math.big{font-size:clamp(24px,2.15vw,32px)}
+.slide:nth-child(1) .mathbar{margin-top:9px!important;padding:8px 12px}
+.slide:nth-child(1) .prose{line-height:1.43}
+.casebox.two-cases .brace{height:110px!important;min-height:0!important}
+.casebox.two-cases .case-line{min-height:33px;padding:4px 8px}
+.slide:nth-child(8) .panel{padding:13px 20px}
+.slide:nth-child(8) .panel.soft{padding:7px 18px}
+.slide:nth-child(8) .equation{line-height:1.35}
+.slide:nth-child(8) .prose{line-height:1.4;margin-bottom:0}
+.slide:nth-child(8) .mathbar{margin-top:9px!important;padding:9px 14px}
+@media(max-height:800px){.slide:nth-child(1) .tax td{padding:4px 4px}.slide:nth-child(1) .panel{padding:9px 13px}.slide:nth-child(8) .panel{padding:10px 17px}}
+
+/* V2: 色彩對應式：應納稅所得額／稅率／速算扣除數；公式常駐，左側推導，右側對照 */
+:root{--base:#73e6ff;--rate:#ffdf8a;--quick:#ff9fcc;--exempt:#f4c878;--social:#bdadff;--additional:#ffb4cd;--other:#9ce2b3}
+.v-base{color:var(--base)!important;font-weight:950}.v-rate{color:var(--rate)!important;font-weight:950}.v-quick{color:var(--quick)!important;font-weight:950}
+.v-exempt{color:var(--exempt)!important;font-weight:950}.v-social{color:var(--social)!important;font-weight:950}.v-additional{color:var(--additional)!important;font-weight:950}.v-other{color:var(--other)!important;font-weight:950}
+.dual-work{display:grid;grid-template-columns:minmax(0,1fr) minmax(340px,.41fr);gap:15px;align-items:start}
+.dual-work.wide-formula{grid-template-columns:minmax(0,1fr) minmax(345px,.43fr)}
+.dual-work.income-work{grid-template-columns:minmax(0,1.12fr) minmax(375px,.88fr)}
+.dual-work .panel{min-width:0}
+.formula-ref{background:linear-gradient(150deg,#20334eed,#131b38f7);border:1.5px solid #e7c981a6;border-radius:18px;padding:17px 19px;box-shadow:0 13px 30px #0004,inset 0 1px #ffffff18;min-width:0}
+.formula-ref .ref-heading{font-size:15px;color:#ffe5ab;font-weight:900;letter-spacing:.03em;margin-bottom:12px}
+.formula-ref .ref-general{font-size:clamp(17px,1.63vw,23px);font-weight:900;line-height:1.62;color:#eaf6ff}
+.formula-ref .ref-general.ref-large{font-size:clamp(18px,1.9vw,26px)}
+.formula-ref .ref-divider{border-top:1px dashed #8ec5e964;margin:15px 0}
+.formula-ref .ref-desc{font-size:clamp(14px,1.16vw,18px);color:#bad7ef;line-height:1.5;margin:7px 0}
+.formula-ref .current-band{border:1px solid #82cce888;border-radius:12px;background:#0c2448d9;padding:11px 13px;margin-top:10px}
+.formula-ref .current-title{font-size:16px;color:#fff0bd;font-weight:950;margin-bottom:7px}
+.formula-ref .current-rule{font-size:clamp(18px,1.48vw,22px);line-height:1.6;font-weight:900;overflow-wrap:normal}
+.formula-ref .current-answer{font-size:clamp(18px,1.75vw,25px);color:#fff2ac;font-weight:950;padding-top:7px}
+.formula-ref .source-line{display:flex;gap:8px;justify-content:space-between;font-size:clamp(15px,1.12vw,18px);border-bottom:1px solid #83acd336;padding:8px 0;align-items:baseline}
+.formula-ref .source-line:last-child{border-bottom:0}
+.formula-ref .source-line b{font-size:1.08em;white-space:nowrap}
+.correspondence-hint{font-size:clamp(14px,1.15vw,17px);color:#abd8f1;margin-top:10px;line-height:1.42}
+.segment-click{cursor:pointer;transition:background .16s,outline-color .16s,box-shadow .16s;outline:2px solid transparent;outline-offset:-2px}
+.segment-click:hover{background:#2a5278a3!important}
+.segment-click.selected{background:#1b4569ed!important;outline:2px solid #ffe29c;box-shadow:inset 5px 0 #ffe29c,0 0 16px #89ceff2b}
+.segment-click:focus-visible{outline:3px solid #fff5b0}
+.dual-work .casebox{grid-template-columns:auto 22px minmax(0,1fr);gap:6px}
+.dual-work .casehead{font-size:clamp(22px,2.1vw,32px)}
+.dual-work .case-line{grid-template-columns:minmax(155px,.75fr) minmax(250px,1fr);gap:8px;font-size:clamp(19px,1.55vw,23px);padding:5px 8px;min-height:39px}
+.dual-work .case-line .interval{font-size:.79em}
+.calc-dual .equation{font-size:clamp(21px,1.94vw,29px);line-height:1.55;white-space:normal}
+.calc-dual .panel{padding:18px 21px}
+.calc-dual .formula-ref{padding:16px 20px}
+.calc-dual .mathbar{margin-top:14px}
+.compact-equation{font-size:clamp(22px,1.87vw,29px);font-weight:900;line-height:1.6;font-family:Arial,"Microsoft Yahei",sans-serif;font-variant-numeric:tabular-nums;white-space:nowrap}
+.line2{padding-left:1.1em}
+.expr-step{margin:6px 0;padding:6px 0;border-bottom:1px solid #648da63d}
+.expr-step:last-child{border:0}
+.ref-vertical .ref-general{font-size:clamp(17px,1.39vw,20px)}
+.ref-vertical .source-line{padding:6px 0}
+.wide-summary .casebox .case-line{padding:5px 8px}
+.formula-strip{border:1.4px solid #e2c58fa6;background:linear-gradient(95deg,#363444aa,#182949bb);border-radius:12px;margin:0 0 12px;padding:10px 17px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:9px;font-size:clamp(17px,1.55vw,22px);font-weight:850}
+.formula-strip .strip-label{font-size:14px;color:#ffe4a3;font-weight:900;margin-right:8px}
+.derivation-card{margin:0 0 8px;padding:10px 16px;background:#102a4b;border:1px solid #75badd7e;border-radius:13px}
+.derivation-card .range{font-size:clamp(17px,1.36vw,20px);color:#b4e7ff;font-weight:900;margin-bottom:4px;line-height:1.42}
+.derivation-card .derive-form{font-size:clamp(20px,1.64vw,25px);font-family:Arial,'Microsoft Yahei',sans-serif;font-weight:850;line-height:1.55;white-space:nowrap}
+.derivation-card .derive-result{color:#fff0a0;font-weight:950}
+.derive-guide{font-size:clamp(14px,1.1vw,17px);margin-bottom:8px;color:#bed8e8}
+.derivation-card .tiny-label{display:inline-block;font-size:13px;min-width:62px;color:#97d7ee;vertical-align:baseline;font-weight:700}
+.pair-key{font-size:clamp(15px,1.35vw,20px);color:#e8f4ff;font-weight:850;line-height:1.42}
+.pair-row{display:grid;grid-template-columns:minmax(0,1fr) 48px minmax(0,1fr);gap:5px;align-items:center;text-align:center}
+.pair-row .connector{font-size:28px;font-weight:950;color:#ffe8a5}
+.bound-compare{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(340px,.85fr);gap:16px;align-items:start}
+.bound-compare .bound-table th{padding:8px}.bound-compare .bound-table td{padding:8px}
+.bound-compare .formula-ref .current-rule{font-size:19px}
+.bound-compare .reference-example{background:#0b2343;border-radius:11px;border:1px solid #93d5ff75;padding:15px;margin-top:13px}
+.bound-compare .reference-example .equation{font-size:clamp(19px,1.5vw,22px);white-space:normal}
+.bound-table tbody tr{cursor:pointer;outline:2px solid transparent;outline-offset:-2px}
+.bound-table tbody tr.selected{outline:2px solid #ffdc91}.bound-table tbody tr.selected td{background:#214a72!important;color:#ffeab2}
+.attribution{font-size:13px;color:#b6cde7;margin-top:8px}
+@media(max-height:800px){.formula-ref{padding:12px 15px}.formula-ref .ref-divider{margin:11px 0}.formula-ref .source-line{padding:5px 0}.dual-work .case-line{min-height:36px;padding:4px 7px}.derivation-card{padding:7px 13px;margin-bottom:6px}.derivation-card .derive-form{line-height:1.38;font-size:clamp(18px,1.52vw,23px)}.derivation-card .range{font-size:clamp(16px,1.21vw,19px)}.calc-dual .panel{padding:12px 16px}.calc-dual .equation{line-height:1.41}.formula-strip{padding:8px 14px;margin-bottom:8px}}
+@media(max-width:1050px){.dual-work,.dual-work.income-work,.dual-work.wide-formula,.bound-compare{grid-template-columns:1fr}.formula-ref{padding:13px 16px}.dual-work .case-line{grid-template-columns:minmax(150px,.7fr) minmax(220px,1fr)}.derivation-card .derive-form{white-space:normal}}
+@media(max-width:650px){.compact-equation{font-size:19px;white-space:normal}.dual-work .case-line{font-size:17px;grid-template-columns:minmax(110px,.7fr) minmax(180px,1fr)}.dual-work .case-line .interval{white-space:normal}.formula-strip{font-size:16px}}
+
+/* 16:9 QA: keep derivations within projector viewport. */
+.slide:nth-child(8) .formula-ref .source-line{padding:3px 0;line-height:1.25}
+.slide:nth-child(8) .formula-ref .ref-divider{margin:7px 0}
+.slide:nth-child(8) .formula-ref .ref-heading{margin-bottom:6px}
+.slide:nth-child(8) .formula-ref .ref-desc{line-height:1.3;margin:5px 0}
+.slide:nth-child(8) .formula-ref .current-band{padding:7px 10px;margin-top:4px}
+.slide:nth-child(8) .formula-ref .current-rule{line-height:1.25}
+.slide:nth-child(8) .panel.soft{padding:4px 18px!important;margin-top:7px!important}
+.slide:nth-child(8) .panel.soft .casebox.two-cases .brace{height:80px!important;min-height:0!important}
+.slide:nth-child(8) .panel.soft .case-line{min-height:29px;padding:2px 7px}
+.slide:nth-child(10) .derivation-card,.slide:nth-child(11) .derivation-card{padding:4px 11px;margin-bottom:4px}
+.slide:nth-child(10) .derivation-card .range,.slide:nth-child(11) .derivation-card .range{font-size:clamp(16px,1.24vw,18px);line-height:1.2;margin-bottom:2px}
+.slide:nth-child(10) .derivation-card .derive-form,.slide:nth-child(11) .derivation-card .derive-form{font-size:clamp(17px,1.36vw,21px);line-height:1.20}
+.slide:nth-child(10) .derivation-card .tiny-label,.slide:nth-child(11) .derivation-card .tiny-label{font-size:12px;min-width:55px}
+.slide:nth-child(10) .derive-guide,.slide:nth-child(11) .derive-guide{font-size:14px;line-height:1.3;margin-bottom:5px}
+.slide:nth-child(10) .panel,.slide:nth-child(11) .panel{padding:9px 12px!important}
+@media(min-width:1051px){.slide:nth-child(10) .formula-ref,.slide:nth-child(11) .formula-ref{position:sticky;top:0}}
+@media(max-height:800px){.slide:nth-child(8) .formula-ref .source-line{padding:2px 0}.slide:nth-child(10) .derivation-card,.slide:nth-child(11) .derivation-card{padding:3px 10px;margin-bottom:4px}.slide:nth-child(10) .derivation-card .derive-form,.slide:nth-child(11) .derivation-card .derive-form{line-height:1.17}}
+
+.tax-ref .current-rule .rule-second{padding-left:1.35em;margin-top:3px}
+.tax-ref .current-rule>div{font-size:clamp(17px,1.4vw,21px);white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="sky"></div>
+<main class="app">
+<header class="header"><div><div class="eyebrow">PEOPLE'S EDUCATION PRESS · 人教版 A 版 · 高一</div><h1>个人所得税与函数｜教材例题＋澳门职业税拓展</h1></div><div class="right"><span class="pill">教材例 8 ＋ 3.4 例 1 ＋ 澳门职业税</span><button id="fullscreen" class="btn">⛶ 全屏</button></div></header>
+<div class="slides" id="slides">
+
+<section class="slide active" data-label="例8｜题目：税额规定">
+<div class="kicker">3.1.2 · 例 8 · 题目（第一部分）</div><h2 class="title">例 8　个人所得税的计算规定</h2>
+<p class="prose small" style="margin:0 0 10px">依法纳税是每个公民应尽的义务。个人取得的所得应依照《中华人民共和国个人所得税法》向国家缴纳个人所得税（简称个税）。2019 年 1 月 1 日起，个税税额根据应纳税所得额、税率和速算扣除数确定。</p>
+<div class="grid57">
+<div class="panel gold"><div class="smalllabel">计算公式 ①</div><div class="math big center" style="margin:18px -5px 25px"><span class="goldtext">个税税额</span> = 应纳税所得额 × 税率 − 速算扣除数</div>
+<div class="smalllabel">计算公式 ②</div><div class="prose" style="font-size:clamp(19px,1.78vw,26px);line-height:1.75;margin-top:7px">应纳税所得额<br>= 综合所得收入额 − 基本减除费用<br>　− 专项扣除 − 专项附加扣除<br>　− 依法确定的其他扣除</div>
+<div class="mathbar gold prose" style="margin-top:17px">其中，“基本减除费用”（免征额）为每年 <span class="yellow">60 000 元</span>。</div></div>
+<div class="panel tight"><div class="smalllabel" style="margin-bottom:8px">表 3.1-5　税率与速算扣除数</div>
+<table class="tax"><thead><tr><th style="width:9%">级数</th><th style="width:49%">全年应纳税所得额 t（元）</th><th style="width:17%">税率</th><th style="width:25%">速算扣除数</th></tr></thead><tbody>
+<tr><td>1</td><td class="interval">[0, 36 000]</td><td>3%</td><td>0</td></tr>
+<tr><td>2</td><td class="interval">(36 000, 144 000]</td><td>10%</td><td>2 520</td></tr>
+<tr><td>3</td><td class="interval">(144 000, 300 000]</td><td>20%</td><td>16 920</td></tr>
+<tr><td>4</td><td class="interval">(300 000, 420 000]</td><td>25%</td><td>31 920</td></tr>
+<tr><td>5</td><td class="interval">(420 000, 660 000]</td><td>30%</td><td>52 920</td></tr>
+<tr><td>6</td><td class="interval">(660 000, 960 000]</td><td>35%</td><td>85 920</td></tr>
+<tr><td>7</td><td class="interval">(960 000, +∞)</td><td>45%</td><td>181 920</td></tr>
+</tbody></table></div></div>
+</section>
+
+<section class="slide" data-label="例8｜题目：两问">
+<div class="kicker">3.1.2 · 例 8 · 题目（第二部分）</div><h2 class="title">例 8　求分段函数，并计算应缴个税</h2>
+<div class="panel" style="padding:24px 32px"><div class="problem-card"><span class="qnum">（1）</span><p>设全年应纳税所得额为 <em>t</em>，应缴纳个人所得税税额为 <em>y</em>，求 <span class="math goldtext">y = f(t)</span>，并画出图象。</p></div>
+<div class="problem-card long"><span class="qnum">（2）</span><p>小王全年综合所得收入额为 <span class="yellow">189 600 元</span>，假定缴纳的基本养老保险、基本医疗保险、失业保险等社会保险费和住房公积金占综合所得收入额的比例分别是 <span class="cyan">8%、2%、1%、9%</span>，专项附加扣除是 <span class="yellow">52 800 元</span>，依法确定其他扣除是 <span class="yellow">4 560 元</span>。那么小王全年应缴纳多少综合所得个人所得税？</p></div></div>
+</section>
+
+<section class="slide" data-label="例8｜解（1）：解析式">
+<div class="kicker">3.1.2 · 例 8 · 解（1）</div><h2 class="title">解（1）根据表 3.1-5，写出分段函数</h2>
+<div class="dual-work wide-formula"><div class="panel" style="padding:15px 17px"><div class="casebox "><div class="casehead">y = f(t) =</div><svg class="brace" viewBox="0 0 22 220" preserveAspectRatio="none" aria-hidden="true"><path d="M20 2 C8 2 8 18 8 36 L8 92 Q8 106 1 110 Q8 114 8 128 L8 184 C8 203 8 218 20 218" fill="none" stroke="#ffdf91" stroke-width="2.4"/></svg><div class="case-lines"><div class="case-line segment-click selected" tabindex="0" role="button" data-tax-index="1" aria-label="查看第1级税率与速算扣除数"><span class="expr"><span class="v-rate">0.03</span><span class="v-base">t</span></span><span class="interval">0 ≤ t ≤ 36 000</span></div><div class="case-line segment-click " tabindex="0" role="button" data-tax-index="2" aria-label="查看第2级税率与速算扣除数"><span class="expr"><span class="v-rate">0.1</span><span class="v-base">t</span> <span class="v-quick">− 2 520</span></span><span class="interval">36 000 &lt; t ≤ 144 000</span></div><div class="case-line segment-click " tabindex="0" role="button" data-tax-index="3" aria-label="查看第3级税率与速算扣除数"><span class="expr"><span class="v-rate">0.2</span><span class="v-base">t</span> <span class="v-quick">− 16 920</span></span><span class="interval">144 000 &lt; t ≤ 300 000</span></div><div class="case-line segment-click " tabindex="0" role="button" data-tax-index="4" aria-label="查看第4级税率与速算扣除数"><span class="expr"><span class="v-rate">0.25</span><span class="v-base">t</span> <span class="v-quick">− 31 920</span></span><span class="interval">300 000 &lt; t ≤ 420 000</span></div><div class="case-line segment-click " tabindex="0" role="button" data-tax-index="5" aria-label="查看第5级税率与速算扣除数"><span class="expr"><span class="v-rate">0.3</span><span class="v-base">t</span> <span class="v-quick">− 52 920</span></span><span class="interval">420 000 &lt; t ≤ 660 000</span></div><div class="case-line segment-click " tabindex="0" role="button" data-tax-index="6" aria-label="查看第6级税率与速算扣除数"><span class="expr"><span class="v-rate">0.35</span><span class="v-base">t</span> <span class="v-quick">− 85 920</span></span><span class="interval">660 000 &lt; t ≤ 960 000</span></div><div class="case-line segment-click " tabindex="0" role="button" data-tax-index="7" aria-label="查看第7级税率与速算扣除数"><span class="expr"><span class="v-rate">0.45</span><span class="v-base">t</span> <span class="v-quick">− 181 920</span></span><span class="interval">t &gt; 960 000</span></div></div></div></div><aside class="formula-ref tax-ref"><div class="ref-heading">① 计算公式｜三项一一对应</div>
+<div class="ref-general"><span class="goldtext">个税税额</span> = <span class="v-base">应纳税所得额</span> × <span class="v-rate">税率</span> − <span class="v-quick">速算扣除数</span></div>
+<div class="ref-general" style="margin-top:9px"><b>y = <span class="v-base">t</span> × <span class="v-rate">税率</span> − <span class="v-quick">速算扣除数</span></b></div><div class="ref-divider"></div><div class="current-title selected-tier">第 1 级｜对应代入</div>
+    <div class="current-band"><div class="current-rule">y = <span class="v-base">t</span> × <span class="v-rate selected-rate">3%</span> − <span class="v-quick selected-quick">0</span></div>
+    <div class="current-answer selected-result">= 0.03t</div></div>
+    <div class="correspondence-hint">点击左侧某个分段，右侧就显示该段的税率和速算扣除数。</div></aside></div>
+<div class="attribution">颜色对应：<span class="v-base">应纳税所得额 t</span>　×　<span class="v-rate">税率</span>　−　<span class="v-quick">速算扣除数</span></div>
+</section>
+
+<section class="slide" data-label="例8｜解（1）：图象">
+<div class="kicker">3.1.2 · 例 8 · 解（1）</div><h2 class="title">函数 y = f(t) 的图象（教材图 3.1-7）</h2>
+<div class="grid64"><div class="chartWrap"><svg id="taxChart" class="chartSvg" viewBox="0 0 920 530" role="img" aria-label="个人所得税分段函数图象；横轴为全年应纳税所得额 t，纵轴为应缴个税 y"></svg></div><div class="panel soft"><h3>各分界点</h3><div class="calc" style="gap:8px">
+<div class="calcrow"><div class="value">(36 000, 1 080)</div></div>
+<div class="calcrow"><div class="value">(144 000, 11 880)</div></div>
+<div class="calcrow"><div class="value">(300 000, 43 080)</div></div>
+<div class="calcrow"><div class="value">(420 000, 73 080)</div></div>
+<div class="calcrow"><div class="value">(660 000, 145 080)</div></div>
+<div class="calcrow"><div class="value">(960 000, 250 080)</div></div></div></div></div>
+</section>
+
+<section class="slide" data-label="例8｜解（2）：求t">
+<div class="kicker">3.1.2 · 例 8 · 解（2）· 第一步</div><h2 class="title">解（2）先计算小王的应纳税所得额</h2>
+<div class="dual-work income-work calc-dual">
+<div class="panel"><div class="smalllabel">在公式 ② 中代入题目给出的数值</div>
+<div class="equation" style="margin-top:12px">t = <span class="v-base">189 600</span> − <span class="v-exempt">60 000</span></div>
+<div class="equation line2">− <span class="v-social">189 600 × (8% + 2% + 1% + 9%)</span></div>
+<div class="equation line2">− <span class="v-additional">52 800</span> − <span class="v-other">4 560</span></div>
+<div class="equation" style="margin-top:15px">= <span class="v-base">0.8 × 189 600</span> − 117 360</div>
+<div class="equation">= <span class="yellow">34 320（元）</span></div>
+</div><aside class="formula-ref"><div class="ref-heading">② 应纳税所得额的计算公式</div>
+<div class="ref-general">应纳税所得额 <span class="goldtext">t</span> =</div>
+<div class="ref-vertical">
+<div class="source-line"><span>综合所得收入额</span><b class="v-base">收入额 x</b></div>
+<div class="source-line"><span>− 基本减除费用</span><b class="v-exempt">− 60 000</b></div>
+<div class="source-line"><span>− 专项扣除</span><b class="v-social">− 收入额 × 20%</b></div>
+<div class="source-line"><span>− 专项附加扣除</span><b class="v-additional">− 52 800</b></div>
+<div class="source-line"><span>− 其他扣除</span><b class="v-other">− 4 560</b></div>
+</div><div class="ref-desc" style="margin-top:10px">同色项来自题目与公式②；社保及公积金比例合计 20%。</div></aside></div>
+<div class="panel soft" style="margin-top:11px;padding:12px 20px"><div class="prose medium">因为 <span class="yellow">0 ≤ 34 320 ≤ 36 000</span>，选用表 3.1-5 的 <span class="cyan">第 1 级</span>：<span class="v-rate">税率 3%</span>、<span class="v-quick">速算扣除数 0</span>。</div></div>
+</section>
+
+<section class="slide" data-label="例8｜解（2）：求税额">
+<div class="kicker">3.1.2 · 例 8 · 解（2）· 第二步</div><h2 class="title">解（2）代入函数 y = f(t)，求个税税额</h2>
+<div class="grid57"><div class="panel" style="padding:17px 20px"><div class="smalllabel">公式①：按第 1 级税率代入</div>
+<div class="ref-general math" style="font-size:clamp(19px,1.48vw,23px);margin:9px 0 13px">y = <span class="v-base">应纳税所得额</span> × <span class="v-rate">税率</span> − <span class="v-quick">速算扣除数</span></div>
+<div class="mathbar math medium">y = <span class="v-base">t</span> × <span class="v-rate">3%</span> − <span class="v-quick">0</span></div>
+<div class="equation" style="margin-top:15px">= <span class="v-base">34 320</span> × <span class="v-rate">3%</span> − <span class="v-quick">0</span></div>
+<div class="equation">= <span class="result">1 029.6（元）</span></div></div>
+<div class="resultpanel"><div class="smalllabel center">答</div><div class="answer">1 029.6 <small>元</small></div><div class="prose center">所以，小王应缴纳的综合所得个人所得税税额为 <span class="yellow">1 029.6 元</span>。</div></div></div>
+</section>
+
+<section class="slide" data-label="例1｜题目">
+<div class="kicker">3.4 函数的应用（一）· 例 1 · 题目</div><h2 class="title">例 1　由全年收入直接求应缴个人所得税</h2>
+<div class="panel"><p class="prose medium">设小王的专项扣除比例、专项附加扣除金额、依法确定的其他扣除金额与 <span class="goldtext">3.1.2 例 8</span> 相同。全年综合所得收入额为 <span class="cyan math">x</span>（单位：元），应缴纳综合所得个人所得税税额为 <span class="cyan math">y</span>（单位：元）。</p><div class="problem-card"><span class="qnum">（1）</span><p>求 <span class="math goldtext">y</span> 关于 <span class="math goldtext">x</span> 的函数解析式。</p></div><div class="problem-card"><span class="qnum">（2）</span><p>如果小王全年的综合所得由 <span class="yellow">189 600 元</span> 增加到 <span class="yellow">249 600 元</span>，那么他全年应缴纳多少综合所得个人所得税？</p></div></div>
+</section>
+
+<section class="slide" data-label="例1｜解（1）：先求t">
+<div class="kicker">3.4 · 例 1 · 解（1）· 第一步</div><h2 class="title">先求应纳税所得额 t 关于 x 的解析式</h2>
+<div class="dual-work income-work calc-dual"><div class="panel"><div class="smalllabel">把公式 ② 中的「综合所得收入额」改为 x</div>
+<div class="equation" style="margin-top:13px">t = <span class="v-base">x</span> − <span class="v-exempt">60 000</span> − <span class="v-social">x(8% + 2% + 1% + 9%)</span></div>
+<div class="equation line2">− <span class="v-additional">52 800</span> − <span class="v-other">4 560</span></div>
+<div class="equation" style="margin:15px 0 3px">= <span class="yellow">0.8x − 117 360</span></div>
+<div class="mathbar gold prose medium" style="margin-top:12px">令 <span class="v-base math">t = 0</span>，得 <span class="yellow math">x = 146 700</span>。</div>
+<p class="prose" style="margin-top:9px">当 <span class="cyan">0 ≤ x ≤ 146 700</span> 时，<span class="goldtext">t = 0</span>。</p></div>
+<aside class="formula-ref"><div class="ref-heading">② 应纳税所得额的计算公式</div>
+<div class="ref-general">应纳税所得额 <span class="goldtext">t</span> =</div>
+<div class="ref-vertical">
+<div class="source-line"><span>综合所得收入额</span><b class="v-base">收入额 x</b></div>
+<div class="source-line"><span>− 基本减除费用</span><b class="v-exempt">− 60 000</b></div>
+<div class="source-line"><span>− 专项扣除</span><b class="v-social">− 收入额 × 20%</b></div>
+<div class="source-line"><span>− 专项附加扣除</span><b class="v-additional">− 52 800</b></div>
+<div class="source-line"><span>− 其他扣除</span><b class="v-other">− 4 560</b></div>
+</div><div class="ref-desc">把每个含收入额的项对应写为 x，合并同类项：</div><div class="current-band"><div class="current-rule"><span class="v-base">x − 20%x</span> = <span class="yellow">0.8x</span></div><div class="current-rule"><span class="v-exempt">60 000</span> + <span class="v-additional">52 800</span> + <span class="v-other">4 560</span> = 117 360</div></div></aside></div>
+<div class="panel soft" style="margin-top:11px;padding:10px 20px"><div class="casebox compact two-cases"><div class="casehead">t =</div><svg class="brace" viewBox="0 0 22 220" preserveAspectRatio="none" aria-hidden="true"><path d="M20 2 C8 2 8 18 8 36 L8 92 Q8 106 1 110 Q8 114 8 128 L8 184 C8 203 8 218 20 218" fill="none" stroke="#ffdf91" stroke-width="2.4"/></svg><div class="case-lines"><div class="case-line"><span class="expr">0</span><span class="interval">0 ≤ x ≤ 146 700</span></div><div class="case-line"><span class="expr">0.8x − 117 360</span><span class="interval">x &gt; 146 700</span></div></div></div></div>
+</section>
+
+<section class="slide" data-label="例1｜解（1）：区间转换">
+<div class="kicker">3.4 · 例 1 · 解（1）· 第二步</div><h2 class="title">将 t 的各分段区间转换为 x 的区间</h2>
+<div class="bound-compare"><div class="panel" style="padding:14px 18px"><div class="smalllabel">每个税率分界点都需要转换</div>
+<table class="bound-table" style="margin-top:9px"><thead><tr><th>t 的临界值（元）</th><th>对应的 x 临界值（元）</th></tr></thead><tbody><tr tabindex="0" data-bound-index="0" class=""><td class="v-base">0</td><td class="v-rate">146 700</td></tr><tr tabindex="0" data-bound-index="1" class="selected"><td class="v-base">36 000</td><td class="v-rate">191 700</td></tr><tr tabindex="0" data-bound-index="2" class=""><td class="v-base">144 000</td><td class="v-rate">326 700</td></tr><tr tabindex="0" data-bound-index="3" class=""><td class="v-base">300 000</td><td class="v-rate">521 700</td></tr><tr tabindex="0" data-bound-index="4" class=""><td class="v-base">420 000</td><td class="v-rate">671 700</td></tr><tr tabindex="0" data-bound-index="5" class=""><td class="v-base">660 000</td><td class="v-rate">971 700</td></tr><tr tabindex="0" data-bound-index="6" class=""><td class="v-base">960 000</td><td class="v-rate">1 346 700</td></tr></tbody></table></div>
+<aside class="formula-ref"><div class="ref-heading">已求得的关系式｜一一对应</div>
+<div class="ref-general ref-large"><span class="v-base">t</span> = 0.8<span class="v-rate">x</span> − 117 360</div>
+<div class="ref-general" style="margin-top:14px"><span class="v-rate">x</span> = (<span class="v-base">t</span> + 117 360) ÷ 0.8</div>
+<div class="ref-divider"></div><div class="current-title">当前选中的分界点</div>
+<div class="reference-example"><div class="current-title" id="bound-label">当 t = 36 000</div>
+<div class="equation">0.8x − 117 360 = <span class="v-base" id="bound-t">36 000</span></div>
+<div class="equation">x = <span class="v-rate" id="bound-x">191 700</span></div></div>
+<div class="correspondence-hint">点击左侧表格中的分界点，右侧同步展示如何由 t 换算为 x。</div></aside></div>
+</section>
+
+<section class="slide" data-label="例1｜解（1）：代入前四段">
+<div class="kicker">3.4 · 例 1 · 解（1）· 第三步（上）</div><h2 class="title">将 t = 0.8x − 117 360 代入 y = f(t)</h2>
+    <div class="dual-work"><div class="panel" style="padding:12px 15px"><div class="derive-guide">每一段都按相同顺序：<span class="v-base">选 t 的范围</span> → <span class="v-rate">对应税率</span> → <span class="v-quick">速算扣除数</span> → 代入化简。</div><div class="derivation-card segment-click selected" data-tax-index="0" tabindex="0" role="button"><div class="range">当 0 ≤ x ≤ 146 700 时，t = 0</div><div class="derive-form"><span class="tiny-label">根据范围</span> t = 0，所以 y = <span class="derive-result">0</span></div></div><div class="derivation-card segment-click " data-tax-index="1" tabindex="0" role="button"><div class="range">当 146 700 &lt; x ≤ 191 700 时，0 &lt; t ≤ 36 000</div><div class="derive-form"><span class="tiny-label">原公式</span> y = <span class="v-base">t</span> × <span class="v-rate">3%</span> − <span class="v-quick">0</span></div>
+            <div class="derive-form"><span class="tiny-label">代入 t</span> = <span class="v-base">(0.8x − 117 360)</span> × <span class="v-rate">3%</span> − <span class="v-quick">0</span></div>
+            <div class="derive-form"><span class="tiny-label">化简</span> = <span class="derive-result">0.024x − 3 520.8</span></div></div><div class="derivation-card segment-click " data-tax-index="2" tabindex="0" role="button"><div class="range">当 191 700 &lt; x ≤ 326 700 时，36 000 &lt; t ≤ 144 000</div><div class="derive-form"><span class="tiny-label">原公式</span> y = <span class="v-base">t</span> × <span class="v-rate">10%</span> − <span class="v-quick">2 520</span></div>
+            <div class="derive-form"><span class="tiny-label">代入 t</span> = <span class="v-base">(0.8x − 117 360)</span> × <span class="v-rate">10%</span> − <span class="v-quick">2 520</span></div>
+            <div class="derive-form"><span class="tiny-label">化简</span> = <span class="derive-result">0.08x − 14 256</span></div></div><div class="derivation-card segment-click " data-tax-index="3" tabindex="0" role="button"><div class="range">当 326 700 &lt; x ≤ 521 700 时，144 000 &lt; t ≤ 300 000</div><div class="derive-form"><span class="tiny-label">原公式</span> y = <span class="v-base">t</span> × <span class="v-rate">20%</span> − <span class="v-quick">16 920</span></div>
+            <div class="derive-form"><span class="tiny-label">代入 t</span> = <span class="v-base">(0.8x − 117 360)</span> × <span class="v-rate">20%</span> − <span class="v-quick">16 920</span></div>
+            <div class="derive-form"><span class="tiny-label">化简</span> = <span class="derive-result">0.16x − 40 392</span></div></div></div>
+    <aside class="formula-ref tax-ref"><div class="ref-heading">① 计算公式｜三项一一对应</div>
+<div class="ref-general"><span class="goldtext">个税税额</span> = <span class="v-base">应纳税所得额</span> × <span class="v-rate">税率</span> − <span class="v-quick">速算扣除数</span></div>
+<div class="ref-general" style="margin-top:9px"><b>y = <span class="v-base">t</span> × <span class="v-rate">税率</span> − <span class="v-quick">速算扣除数</span></b></div>
+    <div class="ref-divider"></div><div class="ref-heading" style="margin-bottom:9px">由例 8 得到：<span class="v-base">t = 0.8x − 117 360</span></div>
+    <div class="current-title selected-tier">选中的分段</div><div class="current-band">
+    <div class="source-line"><span>该段税率</span><b class="v-rate selected-rate">—</b></div>
+    <div class="source-line"><span>速算扣除数</span><b class="v-quick selected-quick">—</b></div>
+    <div class="current-rule" style="margin-top:10px"><div>y = <span class="v-base">(0.8x − 117 360)</span></div><div class="rule-second">× <span class="v-rate selected-rate">—</span> − <span class="v-quick selected-quick">—</span></div></div>
+    <div class="current-answer selected-result">= 0</div></div>
+    <div class="correspondence-hint">点击左边任意一段，右边对照数值会同步更新。</div></aside></div>
+</section>
+
+<section class="slide" data-label="例1｜解（1）：代入后四段">
+<div class="kicker">3.4 · 例 1 · 解（1）· 第三步（下）</div><h2 class="title">继续代入其余四个区间</h2>
+    <div class="dual-work"><div class="panel" style="padding:12px 15px"><div class="derive-guide">每一段都按相同顺序：<span class="v-base">选 t 的范围</span> → <span class="v-rate">对应税率</span> → <span class="v-quick">速算扣除数</span> → 代入化简。</div><div class="derivation-card segment-click selected" data-tax-index="4" tabindex="0" role="button"><div class="range">当 521 700 &lt; x ≤ 671 700 时，300 000 &lt; t ≤ 420 000</div><div class="derive-form"><span class="tiny-label">原公式</span> y = <span class="v-base">t</span> × <span class="v-rate">25%</span> − <span class="v-quick">31 920</span></div>
+            <div class="derive-form"><span class="tiny-label">代入 t</span> = <span class="v-base">(0.8x − 117 360)</span> × <span class="v-rate">25%</span> − <span class="v-quick">31 920</span></div>
+            <div class="derive-form"><span class="tiny-label">化简</span> = <span class="derive-result">0.2x − 61 260</span></div></div><div class="derivation-card segment-click " data-tax-index="5" tabindex="0" role="button"><div class="range">当 671 700 &lt; x ≤ 971 700 时，420 000 &lt; t ≤ 660 000</div><div class="derive-form"><span class="tiny-label">原公式</span> y = <span class="v-base">t</span> × <span class="v-rate">30%</span> − <span class="v-quick">52 920</span></div>
+            <div class="derive-form"><span class="tiny-label">代入 t</span> = <span class="v-base">(0.8x − 117 360)</span> × <span class="v-rate">30%</span> − <span class="v-quick">52 920</span></div>
+            <div class="derive-form"><span class="tiny-label">化简</span> = <span class="derive-result">0.24x − 88 128</span></div></div><div class="derivation-card segment-click " data-tax-index="6" tabindex="0" role="button"><div class="range">当 971 700 &lt; x ≤ 1 346 700 时，660 000 &lt; t ≤ 960 000</div><div class="derive-form"><span class="tiny-label">原公式</span> y = <span class="v-base">t</span> × <span class="v-rate">35%</span> − <span class="v-quick">85 920</span></div>
+            <div class="derive-form"><span class="tiny-label">代入 t</span> = <span class="v-base">(0.8x − 117 360)</span> × <span class="v-rate">35%</span> − <span class="v-quick">85 920</span></div>
+            <div class="derive-form"><span class="tiny-label">化简</span> = <span class="derive-result">0.28x − 126 996</span></div></div><div class="derivation-card segment-click " data-tax-index="7" tabindex="0" role="button"><div class="range">当 x &gt; 1 346 700 时，t &gt; 960 000</div><div class="derive-form"><span class="tiny-label">原公式</span> y = <span class="v-base">t</span> × <span class="v-rate">45%</span> − <span class="v-quick">181 920</span></div>
+            <div class="derive-form"><span class="tiny-label">代入 t</span> = <span class="v-base">(0.8x − 117 360)</span> × <span class="v-rate">45%</span> − <span class="v-quick">181 920</span></div>
+            <div class="derive-form"><span class="tiny-label">化简</span> = <span class="derive-result">0.36x − 234 732</span></div></div></div>
+    <aside class="formula-ref tax-ref"><div class="ref-heading">① 计算公式｜三项一一对应</div>
+<div class="ref-general"><span class="goldtext">个税税额</span> = <span class="v-base">应纳税所得额</span> × <span class="v-rate">税率</span> − <span class="v-quick">速算扣除数</span></div>
+<div class="ref-general" style="margin-top:9px"><b>y = <span class="v-base">t</span> × <span class="v-rate">税率</span> − <span class="v-quick">速算扣除数</span></b></div>
+    <div class="ref-divider"></div><div class="ref-heading" style="margin-bottom:9px">由例 8 得到：<span class="v-base">t = 0.8x − 117 360</span></div>
+    <div class="current-title selected-tier">选中的分段</div><div class="current-band">
+    <div class="source-line"><span>该段税率</span><b class="v-rate selected-rate">25%</b></div>
+    <div class="source-line"><span>速算扣除数</span><b class="v-quick selected-quick">31 920</b></div>
+    <div class="current-rule" style="margin-top:10px"><div>y = <span class="v-base">(0.8x − 117 360)</span></div><div class="rule-second">× <span class="v-rate selected-rate">25%</span> − <span class="v-quick selected-quick">31 920</span></div></div>
+    <div class="current-answer selected-result">= 0.2x − 61 260</div></div>
+    <div class="correspondence-hint">点击左边任意一段，右边对照数值会同步更新。</div></aside></div>
+</section>
+
+<section class="slide" data-label="例1｜解（1）：完整解析式">
+<div class="kicker">3.4 · 例 1 · 解（1）· 结果</div><h2 class="title">综上，y 关于 x 的函数解析式为</h2>
+<div class="formula-strip"><div><span class="strip-label">公式①</span>y = <span class="v-base">t</span> × <span class="v-rate">税率</span> − <span class="v-quick">速算扣除数</span></div><div><span class="strip-label">公式②</span><span class="v-base">t = 0.8x − 117 360</span>（正值时）</div></div>
+<div class="panel wide-summary" style="padding:10px 22px"><div class="casebox compact"><div class="casehead">y =</div><svg class="brace" viewBox="0 0 22 220" preserveAspectRatio="none" aria-hidden="true"><path d="M20 2 C8 2 8 18 8 36 L8 92 Q8 106 1 110 Q8 114 8 128 L8 184 C8 203 8 218 20 218" fill="none" stroke="#ffdf91" stroke-width="2.4"/></svg><div class="case-lines"><div class="case-line"><span class="expr">0</span><span class="interval">0 ≤ x ≤ 146 700</span></div><div class="case-line"><span class="expr">0.024x − 3 520.8</span><span class="interval">146 700 &lt; x ≤ 191 700</span></div><div class="case-line"><span class="expr">0.08x − 14 256</span><span class="interval">191 700 &lt; x ≤ 326 700</span></div><div class="case-line"><span class="expr">0.16x − 40 392</span><span class="interval">326 700 &lt; x ≤ 521 700</span></div><div class="case-line"><span class="expr">0.2x − 61 260</span><span class="interval">521 700 &lt; x ≤ 671 700</span></div><div class="case-line"><span class="expr">0.24x − 88 128</span><span class="interval">671 700 &lt; x ≤ 971 700</span></div><div class="case-line"><span class="expr">0.28x − 126 996</span><span class="interval">971 700 &lt; x ≤ 1 346 700</span></div><div class="case-line"><span class="expr">0.36x − 234 732</span><span class="interval">x &gt; 1 346 700</span></div></div></div></div>
+</section>
+
+<section class="slide" data-label="例1｜解（2）：求税额">
+<div class="kicker">3.4 · 例 1 · 解（2）</div><h2 class="title">全年收入增加到 249 600 元，应缴多少个税？</h2>
+<div class="grid57"><div class="panel" style="padding:16px 20px"><div class="smalllabel">根据解（1）的解析式</div>
+<div class="prose medium" style="margin:7px 0">当 <span class="yellow">x = 249 600</span> 时，<span class="cyan">191 700 &lt; x ≤ 326 700</span>。</div>
+<div class="formula-strip" style="margin-top:9px;display:block"><span class="strip-label">所对应的原公式①</span><div class="math" style="margin-top:7px;font-size:clamp(19px,1.7vw,25px)">y = <span class="v-base">t</span> × <span class="v-rate">10%</span> − <span class="v-quick">2 520</span></div></div>
+<div class="prose" style="font-size:16px;color:#b4def4">代入 <span class="v-base">t = 0.8x − 117 360</span>，化简得 y = 0.08x − 14 256。</div>
+<div class="equation" style="margin-top:12px;font-size:clamp(21px,1.9vw,28px)">y = 0.08 × 249 600 − 14 256</div><div class="equation">　= <span class="result">5 712（元）</span></div></div>
+<div class="resultpanel"><div class="smalllabel center">答</div><div class="answer">5 712 <small>元</small></div><div class="prose center">所以，小王全年需要缴纳的综合所得个人所得税税额为 <span class="yellow">5 712 元</span>。</div></div></div>
+</section>
+
+
+<section class="slide" data-label="澳门职业税｜规则与设元">
+<div class="kicker">拓展 · 澳门职业税 · 规则与设元</div><h2 class="title">澳门职业税：先把计算条件整理清楚</h2>
+<div class="grid57">
+<div class="panel gold" style="padding:15px 18px">
+<div class="smalllabel">设元与两步计算</div>
+<p class="prose medium" style="margin:8px 0 10px">设澳门某一般纳税人的全年工作收益为 <span class="cyan math">x</span>（单位：澳门元）。为方便作函数，这里暂不讨论不课税收益，只考虑最基本的年收入模型。</p>
+<div class="equation">计税依据 <span class="v-base math">t</span> = <span class="yellow math">max(x − 144 000, 0)</span></div>
+<div class="equation line2">应缴职业税 <span class="v-rate math">y</span> = <span class="yellow math">0.7 × T(t)</span></div>
+<div class="mathbar gold prose" style="margin-top:12px">先按累进税率求出税额 <span class="v-base">T(t)</span>，再因为 <span class="v-quick">2026 年税额扣减率为 30%</span>，所以实际应缴税额是原税额的 <span class="yellow">70%</span>。</div>
+</div>
+<div class="panel" style="padding:14px 18px">
+<div class="smalllabel">已知条件（澳门职业税）</div>
+<table class="bound-table" style="margin-top:9px">
+<thead><tr><th>项目</th><th>内容</th></tr></thead>
+<tbody>
+<tr><td>豁免额</td><td><span class="yellow">144 000</span> 澳门元</td></tr>
+<tr><td>税额扣减率</td><td><span class="yellow">30%</span></td></tr>
+<tr><td>累进税率</td><td>7% ～ 12%</td></tr>
+<tr><td>高龄／伤残</td><td>65 岁以上或符合条件者，豁免额可提高至 <span class="yellow">198 000</span></td></tr>
+</tbody></table>
+<div class="prose small" style="margin-top:8px;color:#bdd9ef">本页以下内容统一按「一般纳税人、豁免额 144 000」来建立函数模型。</div>
+</div></div>
+<div class="panel soft" style="margin-top:10px;padding:10px 20px"><div class="prose medium">因此，澳门职业税的函数建模顺序是：<span class="cyan">先由 x 求出计税依据 t</span>，再由 <span class="goldtext">t 的分段函数</span> 求税额，最后乘上 <span class="yellow">0.7</span> 表示税额扣减后的实际应缴税额。</div></div>
+</section>
+
+<section class="slide" data-label="澳门职业税｜T(t) 分段函数">
+<div class="kicker">拓展 · 澳门职业税 · 第一步</div><h2 class="title">先写出按累进税率计算的税额函数 <span class="math">T(t)</span></h2>
+<div class="formula-strip"><div><span class="strip-label">先求</span>计税依据 <span class="v-base">t = max(x − 144 000, 0)</span></div><div><span class="strip-label">再求</span>税额 <span class="v-rate">T(t)</span></div></div>
+<div class="panel wide-summary" style="padding:10px 22px;margin-top:10px"><div class="casebox compact"><div class="casehead">T(t) =</div><svg class="brace" viewBox="0 0 22 220" preserveAspectRatio="none" aria-hidden="true"><path d="M20 2 C8 2 8 18 8 36 L8 92 Q8 106 1 110 Q8 114 8 128 L8 184 C8 203 8 218 20 218" fill="none" stroke="#ffdf91" stroke-width="2.4"/></svg><div class="case-lines"><div class="case-line"><span class="expr">0</span><span class="interval">t = 0</span></div><div class="case-line"><span class="expr">0.07t</span><span class="interval">0 &lt; t ≤ 20 000</span></div><div class="case-line"><span class="expr">0.08t − 200</span><span class="interval">20 000 &lt; t ≤ 40 000</span></div><div class="case-line"><span class="expr">0.09t − 600</span><span class="interval">40 000 &lt; t ≤ 80 000</span></div><div class="case-line"><span class="expr">0.10t − 1 400</span><span class="interval">80 000 &lt; t ≤ 160 000</span></div><div class="case-line"><span class="expr">0.11t − 3 000</span><span class="interval">160 000 &lt; t ≤ 280 000</span></div><div class="case-line"><span class="expr">0.12t − 5 800</span><span class="interval">t &gt; 280 000</span></div></div></div></div>
+<div class="grid57" style="margin-top:10px">
+<div class="panel" style="padding:12px 16px"><div class="smalllabel">各级「前面积累的税额」</div>
+<div class="calc" style="gap:8px;margin-top:8px">
+<div class="calcrow"><div class="label">前 20 000 元</div><div class="value">20 000 × 7% = 1 400</div></div>
+<div class="calcrow"><div class="label">前 40 000 元</div><div class="value">1 400 + 20 000 × 8% = 3 000</div></div>
+<div class="calcrow"><div class="label">前 80 000 元</div><div class="value">3 000 + 40 000 × 9% = 6 600</div></div>
+<div class="calcrow"><div class="label">前 160 000 元</div><div class="value">6 600 + 80 000 × 10% = 14 600</div></div>
+<div class="calcrow"><div class="label">前 280 000 元</div><div class="value">14 600 + 120 000 × 11% = 27 800</div></div></div></div>
+<div class="panel soft" style="padding:12px 16px"><div class="smalllabel">为什么要写成 <span class="math">ax+b</span> 的形式？</div>
+<p class="prose medium" style="margin:9px 0 0">因为教材里研究的是<strong>分段函数解析式与图像</strong>。把每一段都整理成一次函数，后面画图、比较增长快慢、再讨论退税，都会更方便。</p>
+<div class="mathbar gold prose" style="margin-top:10px">例如：当 <span class="yellow">20 000 &lt; t ≤ 40 000</span> 时，<br>T(t)=1 400+0.08(t−20 000)=<span class="yellow">0.08t−200</span>。</div></div></div>
+</section>
+
+<section class="slide" data-label="澳门职业税｜y(x) 分段函数">
+<div class="kicker">拓展 · 澳门职业税 · 第二步</div><h2 class="title">把 <span class="math">t = max(x−144000,0)</span> 代入，得到 <span class="math">y</span> 关于 <span class="math">x</span> 的分段函数</h2>
+<div class="formula-strip"><div><span class="strip-label">关系 1</span><span class="v-base">t = x − 144 000</span>（当 x &gt; 144 000）</div><div><span class="strip-label">关系 2</span><span class="v-rate">y = 0.7T(t)</span></div></div>
+<div class="panel wide-summary" style="padding:10px 22px;margin-top:10px"><div class="casebox compact"><div class="casehead">y =</div><svg class="brace" viewBox="0 0 22 220" preserveAspectRatio="none" aria-hidden="true"><path d="M20 2 C8 2 8 18 8 36 L8 92 Q8 106 1 110 Q8 114 8 128 L8 184 C8 203 8 218 20 218" fill="none" stroke="#ffdf91" stroke-width="2.4"/></svg><div class="case-lines"><div class="case-line"><span class="expr">0</span><span class="interval">0 ≤ x ≤ 144 000</span></div><div class="case-line"><span class="expr">0.049x − 7 056</span><span class="interval">144 000 &lt; x ≤ 164 000</span></div><div class="case-line"><span class="expr">0.056x − 8 204</span><span class="interval">164 000 &lt; x ≤ 184 000</span></div><div class="case-line"><span class="expr">0.063x − 9 492</span><span class="interval">184 000 &lt; x ≤ 224 000</span></div><div class="case-line"><span class="expr">0.07x − 11 060</span><span class="interval">224 000 &lt; x ≤ 304 000</span></div><div class="case-line"><span class="expr">0.077x − 13 188</span><span class="interval">304 000 &lt; x ≤ 424 000</span></div><div class="case-line"><span class="expr">0.084x − 16 156</span><span class="interval">x &gt; 424 000</span></div></div></div></div>
+<div class="grid57" style="margin-top:10px">
+<div class="panel" style="padding:12px 16px"><div class="smalllabel">对照：各分界点怎样来？</div>
+<div class="calc" style="gap:8px;margin-top:8px">
+<div class="calcrow"><div class="label">t = 0</div><div class="value">x = 144 000</div></div>
+<div class="calcrow"><div class="label">t = 20 000</div><div class="value">x = 164 000</div></div>
+<div class="calcrow"><div class="label">t = 40 000</div><div class="value">x = 184 000</div></div>
+<div class="calcrow"><div class="label">t = 80 000</div><div class="value">x = 224 000</div></div>
+<div class="calcrow"><div class="label">t = 160 000</div><div class="value">x = 304 000</div></div>
+<div class="calcrow"><div class="label">t = 280 000</div><div class="value">x = 424 000</div></div></div></div>
+<div class="panel soft" style="padding:12px 16px"><div class="smalllabel">示范一段代入</div>
+<div class="equation" style="font-size:clamp(19px,1.45vw,24px)">当 224 000 &lt; x ≤ 304 000 时，</div>
+<div class="equation line2">t = x − 144 000，且 T(t)=0.10t−1 400</div>
+<div class="equation line2">y = 0.7(0.10t−1 400)</div>
+<div class="equation line2">= 0.7[0.10(x−144 000)−1 400]</div>
+<div class="equation">= <span class="yellow">0.07x − 11 060</span></div></div></div>
+</section>
+
+<section class="slide" data-label="澳门职业税｜图像">
+<div class="kicker">拓展 · 澳门职业税 · 图像</div><h2 class="title">澳门职业税函数 <span class="math">y=f(x)</span> 的图像</h2>
+<div class="chart-wrap"><div class="panel soft"><svg id="macaoChart" class="chartSvg" viewBox="0 0 920 530" role="img" aria-label="澳门职业税分段函数图像；横轴为全年工作收益 x，纵轴为应缴职业税 y"></svg></div><div class="panel soft"><h3>主要折点</h3><div class="calc" style="gap:8px">
+<div class="calcrow"><div class="value">(144 000, 0)</div></div>
+<div class="calcrow"><div class="value">(164 000, 980)</div></div>
+<div class="calcrow"><div class="value">(184 000, 2 100)</div></div>
+<div class="calcrow"><div class="value">(224 000, 4 620)</div></div>
+<div class="calcrow"><div class="value">(304 000, 10 220)</div></div>
+<div class="calcrow"><div class="value">(424 000, 19 460)</div></div></div>
+<div class="mathbar gold prose" style="margin-top:12px">前面先有一段水平线 <span class="yellow">y=0</span>，因为收入未超过豁免额时，不用缴职业税。</div></div></div>
+</section>
+
+<section class="slide" data-label="澳门职业税｜退税后税负">
+<div class="kicker">拓展 · 澳门职业税 · 退税情形</div><h2 class="title">若再考虑澳门退税：可用 <span class="math">min</span> 与 <span class="math">max</span> 表示</h2>
+<div class="grid57">
+<div class="panel gold" style="padding:15px 18px">
+<div class="smalllabel">设退税前应缴职业税为 <span class="math">y=f(x)</span></div>
+<div class="equation">退回税款 <span class="v-base math">R(x)</span> = <span class="yellow math">min(0.6y, 14 000)</span></div>
+<div class="equation line2">退税后实际税负 <span class="v-rate math">N(x)</span> = y − R(x)</div>
+<div class="equation line2">= <span class="yellow math">y − min(0.6y, 14 000)</span></div>
+<div class="equation line2">= <span class="yellow math">max(0.4y, y−14 000)</span></div>
+<div class="mathbar gold prose" style="margin-top:12px">这正好体现了 <span class="yellow">min</span> 与 <span class="yellow">max</span> 在实际问题中的应用：<br>退税额不会超过 14 000，所以取最小值；实际税负等于「原税额减退税」，也可以改写成最大值形式。</div>
+<div class="prose small" style="margin-top:10px;color:#e6f2ff">当 <span class="yellow">y ≤ 23 333.33</span> 时，退税额就是 <span class="yellow">0.6y</span>；当 <span class="yellow">y &gt; 23 333.33</span> 时，退税额达到上限 14 000。</div>
+</div>
+<div class="panel soft" style="padding:12px 16px"><div class="smalllabel">对应到收入 x 的分界</div>
+<div class="equation">令 <span class="v-base math">0.6y = 14 000</span></div>
+<div class="equation line2">得 <span class="v-rate math">y = 23 333.33…</span></div>
+<div class="equation line2">再代入澳门职业税函数的最后一段</div>
+<div class="equation line2"><span class="v-base math">0.084x − 16 156 = 23 333.33…</span></div>
+<div class="equation">得 <span class="yellow math">x ≈ 470 111.11</span></div>
+<div class="prose medium" style="margin-top:10px">所以，收入未太高时，退税后实际税负是 <span class="yellow">原税额的 40%</span>；收入再高一些，退税额封顶后，实际税负就变成 <span class="yellow">原税额减 14 000</span>。</div></div></div>
+<div class="chart-wrap" style="margin-top:10px"><div class="panel soft"><svg id="refundChart" class="chartSvg" viewBox="0 0 920 530" role="img" aria-label="澳门职业税退税前后对比图像；横轴为全年工作收益 x，纵轴为税额"></svg></div><div class="panel soft"><h3>图像观察</h3><div class="calc" style="gap:8px"><div class="calcrow"><div class="label">蓝线</div><div class="value">退税前：y = f(x)</div></div><div class="calcrow"><div class="label">金线</div><div class="value">退税后：N(x)</div></div><div class="calcrow"><div class="label">转折点</div><div class="value">x ≈ 470 111.11</div></div></div><div class="mathbar gold prose" style="margin-top:12px">若把这部分做成练习题，可以让学生先写出 <span class="yellow">R(x)</span>，再写出 <span class="yellow">N(x)</span>，最后观察图像在退税封顶前后斜率怎样改变。</div></div></div>
+</section>
+
+</div>
+<footer class="footer"><div class="pager"><button id="prev" class="btn">← 上一页</button><span class="count" id="counter">1 / 13</span><button id="next" class="btn primary">下一页 →</button></div><div class="chapter" id="chapter">教材例题</div><select class="jump" id="jump" aria-label="跳转到指定页面"></select></footer>
+</main>
+<script>
+(()=>{
+const slides=[...document.querySelectorAll('.slide')];let index=0;
+const counter=document.getElementById('counter'),jump=document.getElementById('jump'),chapter=document.getElementById('chapter');
+slides.forEach((s,i)=>{const option=document.createElement('option');option.value=String(i);option.textContent=`${i+1}. ${s.dataset.label}`;jump.appendChild(option)});
+function go(n){index=Math.min(Math.max(n,0),slides.length-1);slides.forEach((s,i)=>{s.classList.toggle('active',i===index);if(i===index)s.scrollTop=0});counter.textContent=`${index+1} / ${slides.length}`;jump.value=String(index);chapter.textContent=slides[index].dataset.label;document.getElementById('prev').disabled=index===0;document.getElementById('next').disabled=index===slides.length-1;}
+document.getElementById('prev').onclick=()=>go(index-1);document.getElementById('next').onclick=()=>go(index+1);jump.onchange=()=>go(Number(jump.value));
+document.addEventListener('keydown',e=>{const a=e.target;if(a && (a.tagName==='SELECT'||a.tagName==='INPUT'||a.tagName==='TEXTAREA'))return;if(['ArrowRight','PageDown',' ','Enter'].includes(e.key)){e.preventDefault();go(index+1)}else if(['ArrowLeft','PageUp','Backspace'].includes(e.key)){e.preventDefault();go(index-1)}else if(e.key==='Home'){e.preventDefault();go(0)}else if(e.key==='End'){e.preventDefault();go(slides.length-1)}});
+document.getElementById('fullscreen').onclick=()=>{if(document.fullscreenElement){document.exitFullscreen()}else{document.documentElement.requestFullscreen?.()}};
+function graph(){const svg=document.getElementById('taxChart');const NS='http://www.w3.org/2000/svg';const W=920,H=530,p={l:92,r:34,t:30,b:65};const xMax=1080000,yMax=320000;const sx=v=>p.l+v/xMax*(W-p.l-p.r),sy=v=>H-p.b-v/yMax*(H-p.t-p.b);function add(tag,attrs,parent=svg){const el=document.createElementNS(NS,tag);Object.keys(attrs).forEach(k=>el.setAttribute(k,attrs[k]));parent.appendChild(el);return el}function label(x,y,text,attrs={}){const el=add('text',{x,y,fill:'#c6dff3','font-size':16,'font-family':'Arial,Microsoft YaHei',...attrs});el.textContent=text;return el}
+[0,50000,100000,150000,200000,250000,300000].forEach(y=>{add('line',{x1:sx(0),x2:sx(xMax),y1:sy(y),y2:sy(y),stroke:'#82b0cf',opacity:'.18','stroke-width':1});label(sx(0)-13,sy(y)+6,(y/10000).toLocaleString('en-US')+'万',{'text-anchor':'end','font-size':14})});
+add('line',{x1:sx(0),x2:sx(xMax),y1:sy(0),y2:sy(0),stroke:'#d8edff','stroke-width':2});add('line',{x1:sx(0),x2:sx(0),y1:sy(0),y2:sy(yMax),stroke:'#d8edff','stroke-width':2});
+const coords=[[0,0],[36000,1080],[144000,11880],[300000,43080],[420000,73080],[660000,145080],[960000,250080],[1080000,304080]];const colors=['#f9b8de','#77d3ff','#b9a2ff','#77e3ba','#f2a2ce','#ffdc7b','#f1b777'];
+for(let i=0;i<coords.length-1;i++){let [a,b]=[coords[i],coords[i+1]];add('line',{x1:sx(a[0]),y1:sy(a[1]),x2:sx(b[0]),y2:sy(b[1]),stroke:colors[i],'stroke-width':5,'stroke-linecap':'round'})}
+coords.slice(1,7).forEach(([x,y])=>{add('line',{x1:sx(x),x2:sx(x),y1:sy(y),y2:sy(0),stroke:'#8dadd2','stroke-dasharray':'5,7',opacity:'.70'});add('circle',{cx:sx(x),cy:sy(y),r:5,fill:'#fff0ba',stroke:'#172646','stroke-width':2});label(sx(x),sy(0)+25,(x/1000).toLocaleString('en-US')+'k',{'text-anchor':'middle','font-size':14})});
+label(sx(xMax),sy(0)+45,'t（元）',{'text-anchor':'end','font-size':18,'font-weight':'bold'});label(sx(0)-60,sy(yMax)-6,'y（元）',{'font-size':18,'font-weight':'bold'});label(sx(0)+9,sy(0)+25,'0',{'font-size':15});
+}graph();
+
+function macaoGraph(){
+ const svg=document.getElementById('macaoChart'); if(!svg) return; svg.innerHTML='';
+ const NS='http://www.w3.org/2000/svg';const W=920,H=530,p={l:88,r:28,t:30,b:65};
+ const xMax=560000,yMax=32000;
+ const sx=v=>p.l+v/xMax*(W-p.l-p.r),sy=v=>H-p.b-v/yMax*(H-p.t-p.b);
+ function add(tag,attrs,parent=svg){const el=document.createElementNS(NS,tag);Object.keys(attrs).forEach(k=>el.setAttribute(k,attrs[k]));parent.appendChild(el);return el}
+ function label(x,y,text,attrs={}){const el=add('text',{x,y,fill:'#c6dff3','font-size':16,'font-family':'Arial,Microsoft YaHei',...attrs});el.textContent=text;return el}
+ [0,5000,10000,15000,20000,25000,30000].forEach(y=>{add('line',{x1:sx(0),x2:sx(xMax),y1:sy(y),y2:sy(y),stroke:'#82b0cf',opacity:'.18','stroke-width':1});label(sx(0)-12,sy(y)+6,String(y),{'text-anchor':'end','font-size':14})});
+ [0,100000,200000,300000,400000,500000].forEach(x=>{add('line',{x1:sx(x),x2:sx(x),y1:sy(0),y2:sy(yMax),stroke:'#82b0cf',opacity:'.12','stroke-width':1});if(x>0)label(sx(x),sy(0)+25,(x/1000)+'k',{'text-anchor':'middle','font-size':14})});
+ add('line',{x1:sx(0),x2:sx(xMax),y1:sy(0),y2:sy(0),stroke:'#d8edff','stroke-width':2});add('line',{x1:sx(0),x2:sx(0),y1:sy(0),y2:sy(yMax),stroke:'#d8edff','stroke-width':2});
+ const coords=[[0,0],[144000,0],[164000,980],[184000,2100],[224000,4620],[304000,10220],[424000,19460],[560000,30884]];
+ const colors=['#6ec5ff','#79e2ff','#8be0b5','#f8d478','#f1b777','#ef9ac3','#dcb3ff'];
+ for(let i=0;i<coords.length-1;i++){const a=coords[i],b=coords[i+1];add('line',{x1:sx(a[0]),y1:sy(a[1]),x2:sx(b[0]),y2:sy(b[1]),stroke:colors[i],'stroke-width':5,'stroke-linecap':'round'})}
+ [[144000,0],[164000,980],[184000,2100],[224000,4620],[304000,10220],[424000,19460]].forEach(([x,y])=>{add('line',{x1:sx(x),x2:sx(x),y1:sy(y),y2:sy(0),stroke:'#8dadd2','stroke-dasharray':'5,7',opacity:'.70'});add('circle',{cx:sx(x),cy:sy(y),r:5,fill:'#fff0ba',stroke:'#172646','stroke-width':2});});
+ label(sx(xMax),sy(0)+45,'x（澳门元）',{'text-anchor':'end','font-size':18,'font-weight':'bold'});label(sx(0)-68,sy(yMax)-6,'y（澳门元）',{'font-size':18,'font-weight':'bold'});label(sx(0)+9,sy(0)+25,'0',{'font-size':15});
+}
+function refundGraph(){
+ const svg=document.getElementById('refundChart'); if(!svg) return; svg.innerHTML='';
+ const NS='http://www.w3.org/2000/svg';const W=920,H=530,p={l:88,r:28,t:30,b:65};
+ const xMax=560000,yMax=34000;
+ const sx=v=>p.l+v/xMax*(W-p.l-p.r),sy=v=>H-p.b-v/yMax*(H-p.t-p.b);
+ function add(tag,attrs,parent=svg){const el=document.createElementNS(NS,tag);Object.keys(attrs).forEach(k=>el.setAttribute(k,attrs[k]));parent.appendChild(el);return el}
+ function label(x,y,text,attrs={}){const el=add('text',{x,y,fill:'#c6dff3','font-size':16,'font-family':'Arial,Microsoft YaHei',...attrs});el.textContent=text;return el}
+ [0,5000,10000,15000,20000,25000,30000].forEach(y=>{add('line',{x1:sx(0),x2:sx(xMax),y1:sy(y),y2:sy(y),stroke:'#82b0cf',opacity:'.18','stroke-width':1});label(sx(0)-12,sy(y)+6,String(y),{'text-anchor':'end','font-size':14})});
+ [0,100000,200000,300000,400000,500000].forEach(x=>{add('line',{x1:sx(x),x2:sx(x),y1:sy(0),y2:sy(yMax),stroke:'#82b0cf',opacity:'.12','stroke-width':1});if(x>0)label(sx(x),sy(0)+25,(x/1000)+'k',{'text-anchor':'middle','font-size':14})});
+ add('line',{x1:sx(0),x2:sx(xMax),y1:sy(0),y2:sy(0),stroke:'#d8edff','stroke-width':2});add('line',{x1:sx(0),x2:sx(0),y1:sy(0),y2:sy(yMax),stroke:'#d8edff','stroke-width':2});
+ const before=[[0,0],[144000,0],[164000,980],[184000,2100],[224000,4620],[304000,10220],[424000,19460],[560000,30884]];
+ const after=[[0,0],[144000,0],[164000,392],[184000,840],[224000,1848],[304000,4088],[424000,7784],[470111.11,9333.33],[560000,16884]];
+ for(let i=0;i<before.length-1;i++){const a=before[i],b=before[i+1];add('line',{x1:sx(a[0]),y1:sy(a[1]),x2:sx(b[0]),y2:sy(b[1]),stroke:'#67c7ff','stroke-width':4,'stroke-linecap':'round'})}
+ for(let i=0;i<after.length-1;i++){const a=after[i],b=after[i+1];add('line',{x1:sx(a[0]),y1:sy(a[1]),x2:sx(b[0]),y2:sy(b[1]),stroke:'#ffd36e','stroke-width':5,'stroke-linecap':'round'})}
+ [[144000,0],[424000,19460],[470111.11,9333.33]].forEach(([x,y])=>{add('line',{x1:sx(x),x2:sx(x),y1:sy(y),y2:sy(0),stroke:'#8dadd2','stroke-dasharray':'5,7',opacity:'.70'});add('circle',{cx:sx(x),cy:sy(y),r:5,fill:'#fff0ba',stroke:'#172646','stroke-width':2});});
+ add('rect',{x:sx(315000),y:sy(32500),width:220,height:48,rx:12,fill:'#102447ee',stroke:'#7ccfff66'});
+ add('line',{x1:sx(325000),y1:sy(30700),x2:sx(355000),y2:sy(30700),stroke:'#67c7ff','stroke-width':4});label(sx(363000),sy(30700)+5,'退税前 y=f(x)',{'font-size':15});
+ add('line',{x1:sx(325000),y1:sy(28700),x2:sx(355000),y2:sy(28700),stroke:'#ffd36e','stroke-width':5});label(sx(363000),sy(28700)+5,'退税后 N(x)',{'font-size':15});
+ label(sx(470111.11),sy(0)+25,'470.1k',{'text-anchor':'middle','font-size':14});
+ label(sx(xMax),sy(0)+45,'x（澳门元）',{'text-anchor':'end','font-size':18,'font-weight':'bold'});label(sx(0)-68,sy(yMax)-6,'税额（澳门元）',{'font-size':18,'font-weight':'bold'});label(sx(0)+9,sy(0)+25,'0',{'font-size':15});
+}
+macaoGraph();refundGraph();
+
+const taxRates=['','3%','10%','20%','25%','30%','35%','45%'];
+const taxQuicks=['','0','2 520','16 920','31 920','52 920','85 920','181 920'];
+const taxResults=['0','0.03t','0.1t − 2 520','0.2t − 16 920','0.25t − 31 920','0.3t − 52 920','0.35t − 85 920','0.45t − 181 920'];
+const taxXResults=['0','0.024x − 3 520.8','0.08x − 14 256','0.16x − 40 392','0.2x − 61 260','0.24x − 88 128','0.28x − 126 996','0.36x − 234 732'];
+function selectTaxRow(row){
+ const slide=row.closest('.slide'); if(!slide) return;
+ const n=Number(row.dataset.taxIndex);slide.querySelectorAll('[data-tax-index]').forEach(e=>e.classList.toggle('selected',e===row));
+ const ref=slide.querySelector('.tax-ref');if(!ref)return;
+ const tier=ref.querySelector('.selected-tier');if(tier)tier.textContent=n===0?'免税区间｜t = 0':'第 '+n+' 级｜对应代入';
+ ref.querySelectorAll('.selected-rate').forEach(e=>e.textContent=n===0?'—':taxRates[n]);
+ ref.querySelectorAll('.selected-quick').forEach(e=>e.textContent=n===0?'—':taxQuicks[n]);
+ const result=ref.querySelector('.selected-result');if(result)result.textContent='= '+(slide.querySelector('.derivation-card')?taxXResults[n]:taxResults[n]);
+ const rule=ref.querySelector('.current-rule');
+ if(rule&&slide.querySelector('.derivation-card')){
+  rule.innerHTML=n===0?'因为 <span class="v-base">t = 0</span>，所以 <b>y = 0</b>':'<div>y = <span class="v-base">(0.8x − 117 360)</span></div><div class="rule-second">× <span class="v-rate selected-rate">'+taxRates[n]+'</span> − <span class="v-quick selected-quick">'+taxQuicks[n]+'</span></div>';
+ }
+}
+document.querySelectorAll('[data-tax-index]').forEach(row=>{
+  row.addEventListener('click',()=>selectTaxRow(row));
+  row.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.stopPropagation();selectTaxRow(row)}});
+});
+const boundPairs=[['0','146 700'],['36 000','191 700'],['144 000','326 700'],['300 000','521 700'],['420 000','671 700'],['660 000','971 700'],['960 000','1 346 700']];
+function selectBound(row){const n=Number(row.dataset.boundIndex);row.closest('table').querySelectorAll('tbody tr').forEach(e=>e.classList.toggle('selected',e===row));
+ document.getElementById('bound-label').textContent='当 t = '+boundPairs[n][0];document.getElementById('bound-t').textContent=boundPairs[n][0];document.getElementById('bound-x').textContent=boundPairs[n][1];}
+document.querySelectorAll('[data-bound-index]').forEach(row=>{row.addEventListener('click',()=>selectBound(row));row.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.stopPropagation();selectBound(row)}})});
+go(0);
+})();
+</script>
+</body></html>
